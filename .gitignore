@@ -4,6 +4,11 @@
 .vscode/launch.json
 .vscode/ipch
 
+free2breathe/.vscode/c_cpp_properties.json
+free2breathe/.vscode/launch.json
+
+free2breathe_pcb/free2breathe_pcb-backups
+
 # PCB Temporary files
 *.000
 *.bak
