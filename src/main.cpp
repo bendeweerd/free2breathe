@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "leds/LEDController.h"
-#define NUM_LEDS 5
+#define NUM_LEDS 100
 #define LED_DATA_PIN 8
 CRGB leds[NUM_LEDS];
 
@@ -45,6 +45,12 @@ void loop() {
         LEDController.ChangeState(f2b::LEDState::PULSE_RED);
         break;
       case f2b::LEDState::PULSE_RED:
+        LEDController.ChangeState(f2b::LEDState::SOLID_YELLOW);
+        break;
+      case f2b::LEDState::SOLID_YELLOW:
+        LEDController.ChangeState(f2b::LEDState::PULSE_YELLOW);
+        break;
+      case f2b::LEDState::PULSE_YELLOW:
         LEDController.ChangeState(f2b::LEDState::PULSE_BLUE);
         break;
     }
