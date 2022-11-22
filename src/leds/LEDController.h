@@ -12,6 +12,13 @@ enum LEDState {
   PULSE_RED,
   SOLID_YELLOW,
   PULSE_YELLOW,
+  LOADING_SPIN,
+};
+
+enum LEDEffect {
+  PULSE,
+  SOLID,
+  LOADING,
 };
 
 /*
@@ -25,11 +32,15 @@ class LEDController {
  private:
   unsigned long currentMillis = 0;
   unsigned long previousMillis = 0;
-  int pulseBrightness = 0;
-  int pulseDirection = 1;
+  unsigned pulseBrightness = 0;
+  unsigned pulseDirection = 1;
   unsigned pulseWaitTime = 1;
 
+  unsigned loadingWaitTime = 150;
+  unsigned loadingLeadDot = 0;
+
   bool pulse = false;
+  bool loading = false;
 
   unsigned int r = 0;
   unsigned int g = 0;
@@ -37,7 +48,8 @@ class LEDController {
 
  public:
   LEDState currentLEDState;
-  int num_leds = 0;
+  LEDEffect currentLEDEffect;
+  unsigned num_leds = 0;
   CRGB* leds = 0;
 
   /**
@@ -67,46 +79,60 @@ class LEDController {
         r = 0;
         g = 0;
         b = 255;
-        pulse = true;
+        currentLEDEffect = PULSE;
         break;
       case PULSE_GREEN:
         r = 0;
         g = 255;
         b = 0;
-        pulse = true;
+        currentLEDEffect = PULSE;
         break;
       case SOLID_RED:
         r = 255;
         g = 0;
         b = 0;
-        pulse = false;
+        currentLEDEffect = SOLID;
         break;
       case PULSE_RED:
         r = 255;
         g = 0;
         b = 0;
-        pulse = true;
+        currentLEDEffect = PULSE;
         break;
       case SOLID_YELLOW:
         r = 255;
         g = 255;
         b = 0;
-        pulse = false;
+        currentLEDEffect = SOLID;
+        break;
       case PULSE_YELLOW:
         r = 255;
         g = 255;
         b = 0;
-        pulse = true;
+        currentLEDEffect = PULSE;
+        break;
+      case LOADING_SPIN:
+        r = 0;
+        g = 0;
+        b = 255;
+        currentLEDEffect = LOADING;
+        break;
     }
 
-    if (pulse) {
-      applyPulse();
+    switch (currentLEDEffect) {
+      case PULSE:
+        applyPulse();
+        break;
+      case LOADING:
+        applyLoading();
+        break;
+      default:
+        for (unsigned i = 0; i < num_leds; i++) {
+          leds[i] = CRGB(r, g, b);
+        }
+        FastLED.show();
+        break;
     }
-
-    for (int i = 0; i < num_leds; i++) {
-      leds[i] = CRGB(r, g, b);
-    }
-    FastLED.show();
   };  // updateLEDs()
 
   void applyPulse() {
@@ -130,6 +156,29 @@ class LEDController {
     r = map(r, 0, 255, 0, pulseBrightness);
     g = map(g, 0, 255, 0, pulseBrightness);
     b = map(b, 0, 255, 0, pulseBrightness);
+
+    for (unsigned i = 0; i < num_leds; i++) {
+      leds[i] = CRGB(r, g, b);
+    }
+    FastLED.show();
+  }
+
+  void applyLoading() {
+    if (currentMillis - previousMillis >= loadingWaitTime) {
+      if (loadingLeadDot >= num_leds) {
+        loadingLeadDot = 0;
+      }
+
+      leds[loadingLeadDot] = CRGB(r, g, b);
+      FastLED.show();
+      loadingLeadDot++;
+
+      for (unsigned i = 0; i < num_leds; i++) {
+        leds[i].fadeToBlackBy(64);
+      }
+
+      previousMillis = currentMillis;
+    }
   }
 };
 }  // namespace f2b

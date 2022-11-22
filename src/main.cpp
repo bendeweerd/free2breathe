@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <FastLED.h>
-#include <string.h>
 
 #include "leds/LEDController.h"
-#define NUM_LEDS 100
+#define NUM_LEDS 135
 #define LED_DATA_PIN 8
+#define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
 
 f2b::LEDController LEDController = f2b::LEDController(leds, NUM_LEDS);
@@ -16,7 +16,7 @@ bool leds_on = true;
 
 void setup() {
   Serial.begin(9600);
-  FastLED.addLeds<WS2812B, LED_DATA_PIN>(leds, NUM_LEDS)
+  FastLED.addLeds<WS2812B, LED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
       .setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(255);
   FastLED.clear();
@@ -51,12 +51,17 @@ void loop() {
         LEDController.ChangeState(f2b::LEDState::PULSE_YELLOW);
         break;
       case f2b::LEDState::PULSE_YELLOW:
+        LEDController.ChangeState(f2b::LEDState::LOADING_SPIN);
+        break;
+      case f2b::LEDState::LOADING_SPIN:
         LEDController.ChangeState(f2b::LEDState::PULSE_BLUE);
         break;
     }
 
     previousMillis = currentMillis;
   }
+
+  // LEDController.ChangeState(f2b::LEDState::LOADING_SPIN);
 
   LEDController.UpdateLEDs();
 }
