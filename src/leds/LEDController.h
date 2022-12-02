@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #include "FastLED.h"
 
 namespace f2b {
@@ -34,7 +36,7 @@ class LEDController {
   unsigned long previousMillis = 0;
   unsigned pulseBrightness = 0;
   unsigned pulseDirection = 1;
-  unsigned pulseWaitTime = 1;
+  unsigned pulseWaitTime = 4;
 
   unsigned loadingWaitTime = 150;
   unsigned loadingLeadDot = 0;
