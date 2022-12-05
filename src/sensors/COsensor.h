@@ -7,7 +7,7 @@ class COSensor {
   const float Sf = 2.11;
 
   int i = 0;
-  const int numPolls = 256;
+  const int numPolls = 4096;
   bool updateAvg = false;
 
   long int sensorReadSum = 0;
@@ -27,11 +27,23 @@ class COSensor {
   int analogInPin;
   int refInPin;
 
+  /**
+   * @brief Construct a new COSensor object
+   *
+   * @param analogInPin: analog pin connected to sensor output
+   * @param refInPin: analog pin connected to sensor bias voltage
+   */
   COSensor(uint8_t analogInPin, uint8_t refInPin) {
     analogInPin = analogInPin;
     refInPin = refInPin;
   }
 
+  /**
+   * @brief Get current PPM reading from sensor. PPM only updates each
+   * {numPolls} iterations.
+   *
+   * @return float: PPM
+   */
   float read() {
     currentMillis = millis();
     if (currentMillis - previousMillis >= waitTime) {
@@ -49,28 +61,13 @@ class COSensor {
 
       PPM = amountCO * current / sensorSensitivity;
 
-      // print results from tutorial calculations:
-      Serial.print("\n\nPPM = ");
-      Serial.print(((float)sensorReadSum / numPolls / 1024 * Vref / resValue *
-                    1000000000) /
-                   Sf);
-      Serial.print("\tnA = ");
-      Serial.print((float)(sensorReadSum) / numPolls / 1024 * Vref / resValue *
-                   1000000000);
-      Serial.print("\tCounts = ");
-      Serial.println(sensorReadSum);
-      // Serial.print("\tAnalog = ");
-      // Serial.println(analogRead(analogInPin));
-
-      // print results from our calculations:
+      // print results
       Serial.print("PPM = ");
       Serial.print(PPM);
       Serial.print("\tnA = ");
       Serial.print(current * amountCO * 1000000000);
       Serial.print("\tCounts = ");
       Serial.println(sensorReadSum);
-      // Serial.print("\tAnalog = ");
-      // Serial.println(analogRead(analogInPin));
 
       sensorReadSum = 0;
       refReadSum = 0;

@@ -17,6 +17,9 @@ enum LEDState {
   LOADING_SPIN,
 };
 
+/**
+ * @brief Available LED effects
+ */
 enum LEDEffect {
   PULSE,
   SOLID,
@@ -137,6 +140,9 @@ class LEDController {
     }
   };  // updateLEDs()
 
+  /**
+   * @brief Helper method to apply pulse effect
+   */
   void applyPulse() {
     if (currentMillis - previousMillis >= pulseWaitTime) {
       if (pulseDirection == 1) {
@@ -165,6 +171,9 @@ class LEDController {
     FastLED.show();
   }
 
+  /**
+   * @brief Helper method to apply loading effect
+   */
   void applyLoading() {
     if (currentMillis - previousMillis >= loadingWaitTime) {
       if (loadingLeadDot >= num_leds) {

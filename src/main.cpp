@@ -33,45 +33,13 @@ void setup() {
 }
 
 void loop() {
-  currentMillis = millis();
-
   coPPM = sensor0.read();
 
-  if (coPPM > 20) {
+  if (coPPM > 10) {
     LEDController.ChangeState(f2b::LEDState::PULSE_RED);
   } else {
     LEDController.ChangeState(f2b::LEDState::LOADING_SPIN);
   }
-
-  // // loop through LED states
-  // if (currentMillis - previousMillis > period) {
-  //   // rotate through available LED states
-  //   switch (LEDController.currentLEDState) {
-  //     case f2b::LEDState::PULSE_BLUE:
-  //       LEDController.ChangeState(f2b::LEDState::PULSE_GREEN);
-  //       break;
-  //     case f2b::LEDState::PULSE_GREEN:
-  //       LEDController.ChangeState(f2b::LEDState::SOLID_RED);
-  //       break;
-  //     case f2b::LEDState::SOLID_RED:
-  //       LEDController.ChangeState(f2b::LEDState::PULSE_RED);
-  //       break;
-  //     case f2b::LEDState::PULSE_RED:
-  //       LEDController.ChangeState(f2b::LEDState::SOLID_YELLOW);
-  //       break;
-  //     case f2b::LEDState::SOLID_YELLOW:
-  //       LEDController.ChangeState(f2b::LEDState::PULSE_YELLOW);
-  //       break;
-  //     case f2b::LEDState::PULSE_YELLOW:
-  //       LEDController.ChangeState(f2b::LEDState::LOADING_SPIN);
-  //       break;
-  //     case f2b::LEDState::LOADING_SPIN:
-  //       LEDController.ChangeState(f2b::LEDState::PULSE_BLUE);
-  //       break;
-  //   }
-
-  //   previousMillis = currentMillis;
-  // }
 
   LEDController.UpdateLEDs();
 }
