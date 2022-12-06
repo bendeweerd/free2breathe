@@ -16,8 +16,6 @@ float coPPM = 0;
 
 unsigned long currentMillis = 0;
 unsigned long previousMillis = 0;
-unsigned period = 4000;
-bool leds_on = true;
 
 void setup() {
   Serial.begin(9600);
@@ -36,9 +34,11 @@ void loop() {
   coPPM = sensor0.read();
 
   if (coPPM > 10) {
-    LEDController.ChangeState(f2b::LEDState::PULSE_RED);
+    LEDController.currentLEDState = f2b::LEDState::PULSE_RED;
+  } else if (coPPM > 5) {
+    LEDController.currentLEDState = f2b::LEDState::PULSE_YELLOW;
   } else {
-    LEDController.ChangeState(f2b::LEDState::LOADING_SPIN);
+    LEDController.currentLEDState = f2b::LEDState::LOADING_SPIN;
   }
 
   LEDController.UpdateLEDs();

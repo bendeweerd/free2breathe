@@ -39,7 +39,7 @@ class LEDController {
   unsigned long previousMillis = 0;
   unsigned pulseBrightness = 0;
   unsigned pulseDirection = 1;
-  unsigned pulseWaitTime = 4;
+  unsigned pulseWaitTime = 8;
 
   unsigned loadingWaitTime = 150;
   unsigned loadingLeadDot = 0;
@@ -66,12 +66,6 @@ class LEDController {
     leds = ledArray;
     num_leds = numLeds;
   }
-
-  /**
-   * @brief Change LED state
-   * @param newState: new state
-   */
-  void ChangeState(LEDState newState) { currentLEDState = newState; }
 
   /**
    * @brief Update LED strip with current state and brightness

@@ -7,7 +7,7 @@ class COSensor {
   const float Sf = 2.11;
 
   int i = 0;
-  const int numPolls = 4096;
+  const int numPolls = 2048;
   bool updateAvg = false;
 
   long int sensorReadSum = 0;
