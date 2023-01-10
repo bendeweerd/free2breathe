@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "components")(type "KiCad")(uri "${KIPRJMOD}/components")(options "")(descr ""))
+  (lib (name "alarm")(type "KiCad")(uri "${KIPRJMOD}/components/alarm.pretty")(options "")(descr ""))
+)
