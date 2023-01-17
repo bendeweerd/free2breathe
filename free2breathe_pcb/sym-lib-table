@@ -1,4 +1,5 @@
 (sym_lib_table
   (lib (name "IP5328")(type "KiCad")(uri "${KIPRJMOD}/components/IP5328.kicad_sym")(options "")(descr ""))
   (lib (name "110-102")(type "KiCad")(uri "${KIPRJMOD}/components/110-102.kicad_sym")(options "")(descr ""))
+  (lib (name "MCP6044-E_P")(type "KiCad")(uri "${KIPRJMOD}/components/MCP6044-E_P.kicad_sym")(options "")(descr ""))
 )
