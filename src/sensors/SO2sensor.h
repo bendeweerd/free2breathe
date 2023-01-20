@@ -1,11 +1,11 @@
 #include <Arduino.h>
 
-class COSensor {
+class SO2Sensor {
  private:
-  const int resValue = 9870;
+  const int resValue = 9870;  // TODO
   const float Vref = 1.1;
   const float Sf =
-      2.11;  // sensitivity in nA/ppm, ~1/2 stated sensitivity of 4.75 nA/ppm
+      12.5;  // sensitivity in nA/ppm, ~1/2 stated sensitivity of 25 nA/ppm
 
   int i = 0;
   const int numPolls = 2048;
@@ -15,7 +15,7 @@ class COSensor {
   long int refReadSum = 0;
   float sensorValAvg = 0;
   float refValAvg = 0;
-  float amountCO = 0;
+  float amountSO2 = 0;
   float current = 0;
   float sensorSensitivity = 0;
   float PPM = 0;
@@ -29,12 +29,12 @@ class COSensor {
   int refInPin;
 
   /**
-   * @brief Construct a new COSensor object
+   * @brief Construct a new SO2Sensor object
    *
    * @param analogInPin: analog pin connected to sensor output
    * @param refInPin: analog pin connected to sensor bias voltage
    */
-  COSensor(uint8_t analogInPin, uint8_t refInPin) {
+  SO2Sensor(uint8_t analogInPin, uint8_t refInPin) {
     analogInPin = analogInPin;
     refInPin = refInPin;
   }
@@ -56,17 +56,17 @@ class COSensor {
     if (i >= numPolls) {
       sensorReadSum -= refReadSum;
       sensorValAvg = (float)sensorReadSum / numPolls;
-      amountCO = sensorValAvg / 1024;
+      amountSO2 = sensorValAvg / 1024;
       current = Vref / resValue;
       sensorSensitivity = Sf / 1000000000;
 
-      PPM = amountCO * current / sensorSensitivity;
+      PPM = amountSO2 * current / sensorSensitivity;  // TODO
 
       // print results
       Serial.print("PPM = ");
       Serial.print(PPM);
       Serial.print("\tnA = ");
-      Serial.print(current * amountCO * 1000000000);
+      Serial.print(current * amountSO2 * 1000000000);  // TODO
       Serial.print("\tCounts = ");
       Serial.println(sensorReadSum);
 
