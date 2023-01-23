@@ -14,3 +14,4 @@
 12. Determine where to power the Arduino from
 13. Determine battery footprint (same as switch pad?)
 14. Find female connectors for Arduino
+15. Source Transistors
