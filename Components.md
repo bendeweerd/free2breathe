@@ -11,3 +11,6 @@
 9. 1x [JST connector for LEDs](https://www.digikey.com/en/products/detail/jst-sales-america-inc/S3B-PH-K-S-LF-SN/926627)
 10. 4x [Status LEDs](https://www.digikey.com/en/products/detail/inolux/INL-3AB30/7604618)
 11. 4x [Charge LEDs (unless changed)](https://www.digikey.com/en/products/detail/qt-brightek-qtb/QBLP601-IW/4814655)
+12. 1x [Q2 Transistor](https://www.digikey.com/en/products/detail/diodes-incorporated/DMN3404L-7/2052774?utm_adgroup=Semiconductor%20Modules&utm_source=google&utm_medium=cpc&utm_campaign=Dynamic%20Search_EN_Product&utm_term=&utm_content=Semiconductor%20Modules&gclid=CjwKCAiAoL6eBhA3EiwAXDom5mGIaRqLiyGtsB8SfC_R1fkG_G7rwErjXA1T7JVSGXi8-WUpq134sRoCopcQAvD_BwE)
+13. 1x [Q1 Transistor](https://www.digikey.com/en/products/detail/alpha-omega-semiconductor-inc/AO3401A/1855773)
+14. 1x [10mOhm Resistor](https://www.digikey.com/en/products/detail/koa-speer-electronics-inc/UR73D2ATTD10L0F/9845679)
