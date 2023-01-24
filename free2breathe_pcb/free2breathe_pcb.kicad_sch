@@ -6222,7 +6222,7 @@
     (property "Value" "LED_Connector" (id 1) (at 400.05 90.1699 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_JST:JST_PH_B3B-PH-K_1x03_P2.00mm_Vertical" (id 2) (at 398.78 88.9 0)
+    (property "Footprint" "Connector_JST:JST_PH_S3B-PH-K_1x03_P2.00mm_Horizontal" (id 2) (at 398.78 88.9 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 398.78 88.9 0)
@@ -7119,7 +7119,7 @@
       (reference "J1") (unit 1) (value "USB4110-GF-A_REVB") (footprint "components:GCT_USB4110-GF-A_REVB")
     )
     (path "/c4414011-bc6e-427d-914d-4b02080af175"
-      (reference "J2") (unit 1) (value "LED_Connector") (footprint "Connector_JST:JST_PH_B3B-PH-K_1x03_P2.00mm_Vertical")
+      (reference "J2") (unit 1) (value "LED_Connector") (footprint "Connector_JST:JST_PH_S3B-PH-K_1x03_P2.00mm_Horizontal")
     )
     (path "/4bd3da1a-b4fb-485a-b13c-20d04d4b9acb"
       (reference "J3") (unit 1) (value "Alarm_Connector") (footprint "alarm:AT_1127_ST_2_R_Alarm")

@@ -15,5 +15,6 @@
 13. (Done) <s>Determine battery footprint (same as switch pad?)</s>
 14. (Done) <s>Find female connectors for Arduino</s>
 15. Source Transistors
-16. Change Power status LEDs to small SMT??
+16. Change Power status LEDs to small SMT
 17. (Done) <s>Add mounting holes (to ground)</s>
+18. Change LED connector from vertical JST (too high) to ?(solder pads)
