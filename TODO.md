@@ -21,3 +21,4 @@
 19. Adjust LED placements for both status and power
 20. Place buzzer and LED connector
 21. Route traces
+22. (Done) <s>Adjust Via size for power traces?</s>
