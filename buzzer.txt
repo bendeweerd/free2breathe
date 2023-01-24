@@ -1,0 +1,26 @@
+long int currentMillis = 0;
+long int previousMillis = 0;
+int waitTime = 250;
+bool on = true;
+
+void setup() {
+  TCCR2B = TCCR2B & B11111000 | B00000011;
+  pinMode(3, OUTPUT);
+  pinMode(A0, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  currentMillis = millis();
+  if(currentMillis - previousMillis >= waitTime){
+    on = !on;
+    previousMillis = currentMillis;
+  }
+  
+  if(on){
+    analogWrite(3, 128);
+  }else{
+    analogWrite(3, 0);
+  }
+
+}

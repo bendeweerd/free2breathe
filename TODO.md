@@ -22,3 +22,4 @@
 20. Place buzzer and LED connector
 21. Route traces
 22. (Done) <s>Adjust Via size for power traces?</s>
+23. Check guidelines on IC datasheet (especially for trace separation)

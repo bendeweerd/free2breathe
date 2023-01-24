@@ -9,3 +9,5 @@
 7. 1x [USB-C Connector](https://www.digikey.com/en/products/detail/gct/USB4110-GF-A/10384547)
 8. 1x [Switch](https://www.digikey.com/en/products/detail/e-switch/EG1213/101735)
 9. 1x [JST connector for LEDs](https://www.digikey.com/en/products/detail/jst-sales-america-inc/S3B-PH-K-S-LF-SN/926627)
+10. 4x [Status LEDs](https://www.digikey.com/en/products/detail/inolux/INL-3AB30/7604618)
+11. 4x [Charge LEDs (unless changed)](https://www.digikey.com/en/products/detail/qt-brightek-qtb/QBLP601-IW/4814655)

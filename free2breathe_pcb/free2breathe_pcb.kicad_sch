@@ -6525,7 +6525,7 @@
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "22uF 25V" (id 1) (at 226.06 88.9 0)
-      (effects (font (size 1.27 1.27)) (justify left))
+      (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Footprint" "Capacitor_SMD:C_0603_1608Metric" (id 2) (at 230.8352 85.09 0)
       (effects (font (size 1.27 1.27)) hide)
