@@ -20,8 +20,10 @@
 18. <s>Change LED connector from vertical JST (too high) to ?(solder pads)</s>
 19. <s>Adjust LED placements for both status and power</s>
 20. <s>Place buzzer and LED connector</s>
-21. Route traces
+21. <s>Route traces</s>
 22. <s>Adjust Via size for power traces?</s>
-23. Check guidelines on IC datasheet (especially for trace separation)
-24. Current sense resistor
-25. Determine whether unused pins should be high or low
+23. <s>Check guidelines on IC datasheet (especially for trace separation)</s>
+24. <s>Current sense resistor</s>
+25. <s>Determine whether unused pins should be high or low</s>
+26. <s>Add stitching vias</s>
+27. Adjust silkscreen labels
