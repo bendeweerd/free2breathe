@@ -27,3 +27,6 @@
 25. <s>Determine whether unused pins should be high or low</s>
 26. <s>Add stitching vias</s>
 27. Adjust silkscreen labels
+28. Add filled zones
+29. Generate BOM, order components
+30. Generate Gerber files, order boards
