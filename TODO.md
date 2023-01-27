@@ -26,7 +26,7 @@
 24. <s>Current sense resistor</s>
 25. <s>Determine whether unused pins should be high or low</s>
 26. <s>Add stitching vias</s>
-27. Adjust silkscreen labels
-28. Add filled zones
-29. Generate BOM, order components
-30. Generate Gerber files, order boards
+27. <s>Adjust silkscreen labels</s>
+28. <s>Add filled zones</s>
+29. <s>Generate BOM, order components</s>
+30. <s>Generate Gerber files, order boards</s>
