@@ -25,7 +25,7 @@ class VoltageReader {
     pin2 = pin2;
   }
 
-  float read() {
+  double read() {
     currentMillis = millis();
     if (currentMillis - previousMillis >= waitTime) {
       pin1ReadSum += analogRead(pin1);
@@ -45,13 +45,5 @@ class VoltageReader {
     }
 
     return voltage;
-
-    // int v1 = analogRead(pin1);
-    // int v2 = analogRead(pin2);
-
-    // int diff = v2 - v1;            // range 0:1023
-    // float voltage = diff / 204.6;  // map to 0-5v range
-
-    // return voltage;
   }
 };

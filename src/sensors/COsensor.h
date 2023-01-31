@@ -2,79 +2,70 @@
 
 class COSensor {
  private:
-  const int resValue = 9870;
-  const float Vref = 1.1;
-  const float Sf =
-      2.11;  // sensitivity in nA/ppm, ~1/2 stated sensitivity of 4.75 nA/ppm
+  int refPin;  // reference pin, TP2 on schematic
+  int subPin;  // subtraction pin, TP1 on schematic
 
   int i = 0;
-  const int numPolls = 2048;
+  const int numPolls = 64;
   bool updateAvg = false;
 
-  long int sensorReadSum = 0;
-  long int refReadSum = 0;
-  float sensorValAvg = 0;
-  float refValAvg = 0;
-  float amountCO = 0;
-  float current = 0;
-  float sensorSensitivity = 0;
-  float PPM = 0;
+  long int refPinReadSum = 0;
+  long int subPinReadSum = 0;
+  long int readDiff = 0;
+  double diffAvg = 0;
+  double voltage = 0;
 
   unsigned long previousMillis = 0;
   unsigned long currentMillis = 0;
   unsigned waitTime = 3;
 
- public:
-  int analogInPin;
-  int refInPin;
+  double resValue = 10.0;
+  double amps = 0.0;
+  double nA = 0.0;
+  double ppm = 0.0;
 
-  /**
-   * @brief Construct a new COSensor object
-   *
-   * @param analogInPin: analog pin connected to sensor output
-   * @param refInPin: analog pin connected to sensor bias voltage
-   */
-  COSensor(uint8_t analogInPin, uint8_t refInPin) {
-    analogInPin = analogInPin;
-    refInPin = refInPin;
+  // Sensitivities:
+  // CO: 4.47 nA / ppm
+  // SO2: 39.23 nA / ppm
+  // O3: ~ -60 nA +- 10 / ppm
+  // NO2: ~ -30 nA +- 10 / ppm
+
+  float sensitivity = 4.75;
+
+ public:
+  COSensor(uint8_t refPin, uint8_t subPin) {
+    refPin = refPin;
+    subPin = subPin;
   }
 
-  /**
-   * @brief Get current PPM reading from sensor. PPM only updates each
-   * {numPolls} iterations.
-   *
-   * @return float: PPM
-   */
-  float read() {
+  double read() {
     currentMillis = millis();
     if (currentMillis - previousMillis >= waitTime) {
-      sensorReadSum += analogRead(analogInPin);
-      refReadSum += analogRead(refInPin);
+      refPinReadSum += analogRead(refPin);
+      subPinReadSum += analogRead(subPin);
       previousMillis = currentMillis;
       i++;
     }
     if (i >= numPolls) {
-      sensorReadSum -= refReadSum;
-      sensorValAvg = (float)sensorReadSum / numPolls;
-      amountCO = sensorValAvg / 1024;
-      current = Vref / resValue;
-      sensorSensitivity = Sf / 1000000000;
+      readDiff = refPinReadSum - subPinReadSum;
+      diffAvg = (double)readDiff / (double)numPolls;
 
-      PPM = amountCO * current / sensorSensitivity;
+      voltage = (double)diffAvg / 204.6;  // map from 0-1023 to 0-5v range
 
-      // print results
-      Serial.print("PPM = ");
-      Serial.print(PPM);
-      Serial.print("\tnA = ");
-      Serial.print(current * amountCO * 1000000000);
-      Serial.print("\tCounts = ");
-      Serial.println(sensorReadSum);
+      // map voltage to nA
+      amps = (double)(voltage) / resValue;
 
-      sensorReadSum = 0;
-      refReadSum = 0;
+      nA = amps * 1000000000.0;
+
+      // map nA to PPM
+      ppm = nA / sensitivity;
+
+      refPinReadSum = 0;
+      subPinReadSum = 0;
       i = 0;
     }
 
-    return PPM;
+    return voltage;
+    // return ppm;
   }
 };
