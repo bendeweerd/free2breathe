@@ -5,58 +5,64 @@
   Released into the public domain.
 */
 
-#include "Arduino.h"
 #include "ULP.h"
 
-ULP::ULP (int a, int b, float c) : pCPin(a), pTPin(b), pSf(c) {
+#include "Arduino.h"
 
+ULP::ULP(int a, int b, float c) : pCPin(a), pTPin(b), pSf(c) {
   pTzero = 20.0;
   pIzero = 0.0;
-  
-  //Temperature Sensor Settings
+
+  // Temperature Sensor Settings
   pHtemp = 40.0;
-  pLtemp = 20.0; //temps for cal of temp sensor
-  pTb = 18.0;     //temperature sensor coef
-  pTs = 87.0;     //temperature sensor coef
-  pHvolt = (pHtemp + pTb) * pVsup / pTs;  //volts for cal of temp sensor
-  pLvolt = (pLtemp + pTb) * pVsup / pTs; //volts for cal of temp sensor
+  pLtemp = 20.0;                          // temps for cal of temp sensor
+  pTb = 18.0;                             // temperature sensor coef
+  pTs = 87.0;                             // temperature sensor coef
+  pHvolt = (pHtemp + pTb) * pVsup / pTs;  // volts for cal of temp sensor
+  pLvolt = (pLtemp + pTb) * pVsup / pTs;  // volts for cal of temp sensor
 }
 
-//float ULP::pVcc = 5.0;
-//float ULP::pVsup = 3.3;
+// float ULP::pVcc = 5.0;
+// float ULP::pVsup = 3.3;
 
 void ULP::getTemp(int n) {
-  unsigned long etime, i = 0;
-  unsigned long anaCounts = 0;
-  etime = millis() + n * 1000;
-  do {
-    anaCounts = anaCounts + analogRead(pTPin);
-    delay(1);
-    i++;
-  } while (millis() < etime);
-  float Cnts = float (anaCounts) / float(i);
-  float Volts = Cnts * pVcc / 1024.0;
+  // Serial.println("getTemp()");
+  // unsigned long etime, i = 0;
+  // unsigned long anaCounts = 0;
+  // etime = millis() + n * 1000;
+  // do {
+  //   anaCounts = anaCounts + analogRead(pTPin);
+  //   delay(1);
+  //   i++;
+  // } while (millis() < etime);
+  // float Cnts = float(anaCounts) / float(i);
+  // float Volts = Cnts * pVcc / 1024.0;
 
-  pT = (pTs / pVsup) * Volts - pTb;
-  
- 
+  // // pT = (pTs / pVsup) * Volts - pTb;  //TODO: replace when have temp
+  // pT = 20;
+  // Serial.print("  Setting temp: ");
+  // Serial.println(pT);
+
+  pT = 20;
 }
 
-float ULP::convertT(char U){
-   if (U == 'F') {
+float ULP::convertT(char U) {
+  if (U == 'F') {
     float TempF = pT * 9 / 5 + 32;
     return TempF;
-  }
-  else if ( U == 'C') {
+  } else if (U == 'C') {
     return pT;
-  }
-  else return 0;
+  } else
+    return 0;
 }
 
-float ULP::convertX(char U){
-  if (U == 'B')  return pX;
-  else if (U == 'M') return (pX/1000.0);
-  else return 0;
+float ULP::convertX(char U) {
+  if (U == 'B')
+    return pX;
+  else if (U == 'M')
+    return (pX / 1000.0);
+  else
+    return 0;
 }
 
 void ULP::setTSpan(float t, String R) {
@@ -72,14 +78,13 @@ void ULP::setTSpan(float t, String R) {
     delay(1);
     i++;
   } while (millis() < etime);
-  float Cnts = float (anaCounts) / float(i);
+  float Cnts = float(anaCounts) / float(i);
   float Volts = Cnts * pVcc / 1024;
 
   if (R == "HIGH") {
     pHtemp = t;
     pHvolt = Volts;
-  }
-  else if (R == "LOW") {
+  } else if (R == "LOW") {
     pLtemp = t;
     pLvolt = Volts;
   }
@@ -91,19 +96,25 @@ void ULP::setTSpan(float t, String R) {
   Serial.println(pTb);
 }
 
-void  ULP::setVref (int b, long R2) {
-  //Caluclate Expected Vref
-  if (b >= 0)  pVref = pVsup * float(R2 + 1000000) / float(R2 + 2000000) * 1000.0;
-  else  pVref = pVsup * float(1000000) / float(R2 + 2000000) * 1000.0;
+void ULP::setVref(int b, long R2) {
+  // Caluclate Expected Vref
+  Serial.println("setVref()");
+  if (b >= 0)
+    pVref = pVsup * float(R2 + 1000000) / float(R2 + 2000000) * 1000.0;
+  else
+    pVref = pVsup * float(1000000) / float(R2 + 2000000) * 1000.0;
   pVref_set = pVref;
+  Serial.print("  pVRef = pVref_set: ");
+  Serial.println(pVref);
 }
 
-bool  ULP::OCzero (int n) {
-  //Measure real Vref
+bool ULP::OCzero(int n) {
+  // Measure real Vref
   unsigned long etime, i = 0;
   unsigned long anaCounts = 0;
   Serial.println("Send any character when sensor is removed.");
-  while (Serial.available() <= 0) {}
+  while (Serial.available() <= 0) {
+  }
   Serial.println("Zeroing");
   Serial.flush();
   etime = millis() + n * 1000;
@@ -112,20 +123,29 @@ bool  ULP::OCzero (int n) {
     delay(1);
     i++;
   } while (millis() < etime);
-  float Cnts = float (anaCounts) / float(i);
-  pVref_set = Cnts * pVcc * 1000.0 / 1024.0; //in mV
-      Serial.println(abs(pVref - pVref_set));
+  float Cnts = float(anaCounts) / float(i);
+  pVref_set = Cnts * pVcc * 1000.0 / 1024.0;  // in mV
+  Serial.print("  pVref: ");
+  Serial.println(pVref);
+  Serial.print("  pVref_set: ");
+  Serial.println(pVref_set);
+  Serial.print("  disparity = ");
+  Serial.println(pVref - pVref_set);
 
-  if (abs(pVref - pVref_set) > 50)return false;
-  else return true;
+  if (abs(pVref - pVref_set) > 50)
+    return false;
+  else
+    return true;
 }
 
-void  ULP::zero() {
+void ULP::zero() {
+  Serial.println("zero()");
   pIzero = pInA;
   pTzero = pT;
-} 
+}
 
-void ULP::getIgas(int n){
+void ULP::getIgas(int n) {
+  // Serial.println("getIgas()");
   unsigned long etime, i = 0;
   unsigned long anaCounts = 0;
   etime = millis() + n * 1000;
@@ -134,40 +154,51 @@ void ULP::getIgas(int n){
     delay(1);
     i++;
   } while (millis() < etime);
-  float Cnts = float (anaCounts) / float(i);
+  float Cnts = float(anaCounts) / float(i);
 
-  pVgas = Cnts * pVcc * 1000.0 / 1024.0; //in mV
-  pInA = (pVgas-pVref_set)/pGain * 1000.0; //in nA 
-} 
+  pVgas = Cnts * pVcc * 1000.0 / 1024.0;  // in mV
 
-void  ULP::getConc(float t) {
-  float nA = pInA - pIzero * expI(t-pTzero);
-  float Sens = pSf * (1.0 + pTc * (t - 20.0));
-  pX = nA / Sens * 1000.0; //output in ppb
+  // Serial.print("  mV: ");
+  // Serial.println(pVgas);
+
+  pInA = (pVgas - pVref_set) / pGain * 1000.0;  // in nA
+
+  // Serial.print("  nA: ");
+  // Serial.println(pInA);
 }
 
-float ULP::expI(float T){
-  return exp(T/pn);
+void ULP::getConc(float t) {
+  // Serial.println("getConc()");
+  // float nA = pInA - pIzero * expI(t - pTzero); //TODO: replace
+  // float Sens = pSf * (1.0 + pTc * (t - 20.0));
+  // pX = nA / Sens * 1000.0;  // output in ppb
+
+  pX = pInA / pSf * 1000.0;
+  // Serial.print("  PPB: ");
+  // Serial.println(pX);
 }
+
+float ULP::expI(float T) { return exp(T / pn); }
 
 void ULP::setXSpan() {
   Serial.setTimeout(10000);
   float X;
   float nA, Sf;
-  Serial.print("When gas concentration steady, enter Concentration in ppm followed by 'cr' = ");
-  while (Serial.available() <= 0) {}
+  Serial.print(
+      "When gas concentration steady, enter Concentration in ppm followed by "
+      "'cr' = ");
+  while (Serial.available() <= 0) {
+  }
   X = Serial.parseFloat();
   Serial.println(X);
   getIgas(10);
-  
+
   Sf = pInA / X;
   if (abs(Sf - pSf) * 2 / (Sf + pSf) < .1) {
     pSf = Sf;
-  }
-  else {
+  } else {
     Serial.println("Error Setting Span");
   }
-
 }
 
 EtOH::EtOH(int a, int b, float c) : ULP(a, b, c = 14.0) {
@@ -177,7 +208,7 @@ EtOH::EtOH(int a, int b, float c) : ULP(a, b, c = 14.0) {
   pTc = 0.01;
 }
 
-H2S::H2S (int a, int b, float c): ULP(a, b, c = 194.0) { //works
+H2S::H2S(int a, int b, float c) : ULP(a, b, c = 194.0) {  // works
   setVref(+3, 2000);
   pGain = 49.9;
   pn = -300.0;
@@ -226,5 +257,4 @@ O3::O3(int a, int b, float c) : ULP(a, b, c = -20.0) {
   pTc = -0.005;
 }
 
-SPEC::SPEC(int a, int b, float c): ULP(a, b, c = 1.0) {
-}
+SPEC::SPEC(int a, int b, float c) : ULP(a, b, c = 1.0) {}
