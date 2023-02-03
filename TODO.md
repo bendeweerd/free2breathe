@@ -30,3 +30,13 @@
 28. <s>Add filled zones</s>
 29. <s>Generate BOM, order components</s>
 30. <s>Generate Gerber files, order boards</s>
+
+## REV 2
+1. Space LEDs further
+2. Add standoffs for SPEC sensors (non-standard spacing)
+3. Order Arduino standoffs
+4. Verify schematic
+5. Update board layout with new schematic
+6. Update BOM
+7. Order new parts
+8. Battery spot-welding

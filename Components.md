@@ -14,3 +14,7 @@
 12. 1x [Q2 Transistor](https://www.digikey.com/en/products/detail/diodes-incorporated/DMN3404L-7/2052774?utm_adgroup=Semiconductor%20Modules&utm_source=google&utm_medium=cpc&utm_campaign=Dynamic%20Search_EN_Product&utm_term=&utm_content=Semiconductor%20Modules&gclid=CjwKCAiAoL6eBhA3EiwAXDom5mGIaRqLiyGtsB8SfC_R1fkG_G7rwErjXA1T7JVSGXi8-WUpq134sRoCopcQAvD_BwE)
 13. 1x [Q1 Transistor](https://www.digikey.com/en/products/detail/alpha-omega-semiconductor-inc/AO3401A/1855773)
 14. 1x [10mOhm Resistor](https://www.digikey.com/en/products/detail/koa-speer-electronics-inc/UR73D2ATTD10L0F/9845679)
+
+## REV 2:
+1. 2x [15 Position headers for Nano](https://www.digikey.com/en/products/detail/sullins-connector-solutions/PPTC151LFBN-RC/810153?utm_adgroup=Rectangular%20Connectors%20-%20Headers%2C%20Receptacles%2C%20Female%20Sockets&utm_source=google&utm_medium=cpc&utm_campaign=Shopping_Product_Connectors%2C%20Interconnects_NEW&utm_term=&utm_content=Rectangular%20Connectors%20-%20Headers%2C%20Receptacles%2C%20Female%20Sockets&gclid=Cj0KCQiAlKmeBhCkARIsAHy7WVs3b6SB1XrEz7m_S7QtjQTP1csOWLjT5X7waPIl4WZ6y9WHHwEIGK8aAiHHEALw_wcB)
+2. 12x [2 position headers for SPEC sensors](https://www.digikey.com/en/products/detail/adam-tech/2RS1-02-G/9833032)
