@@ -92,15 +92,27 @@ void setup() {
 
   // CO
   long int CO_R2 = 1990;  // Assumes R1 and R3 are 1 MOhms in resistor ladder
-  float CO_bias = -3.0;
+  float CO_bias = 3.0;
   sensor1.setVref(CO_bias, CO_R2);
   sensor1.pGain = 100000;  // resistor R6
 
   // SO2
+  long int SO2_R2 = 143000;  // TODO: measured values
+  float SO2_bias = 200.0;
+  sensor2.setVref(SO2_bias, SO2_R2);
+  sensor2.pGain = 100000;
 
   // O3
+  long int O3_R2 = 16200;
+  float O3_bias = -25;
+  sensor3.setVref(O3_bias, O3_R2);
+  sensor3.pGain = 499000;
 
   // NO2
+  long int NO2_R2 = 16200;
+  float NO2_bias = -25;
+  sensor4.setVref(NO2_bias, NO2_R2);
+  sensor4.pGain = 499000;
 
   // if you know the V_ref replace the following code...
   //  Serial.println("Remove CO Sensor.");
