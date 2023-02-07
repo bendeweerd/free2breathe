@@ -6294,8 +6294,8 @@
     (tedit 0) (tstamp c5725d22-c890-46e9-aef1-60d9886ab470)
     (at 122.2 95.8)
     (attr board_only exclude_from_pos_files exclude_from_bom)
-    (fp_text reference "G***" (at 13.2 -31.1) (layer "F.SilkS")
-      (effects (font (size 1.524 1.524) (thickness 0.3)))
+    (fp_text reference "G***" (at 0.3 -0.8) (layer "F.SilkS")
+      (effects (font (size 0.0254 0.0254)))
       (tstamp 06d35760-a677-4300-ac51-225f35ae26c1)
     )
     (fp_text value "LOGO" (at 0.75 0) (layer "F.SilkS") hide
