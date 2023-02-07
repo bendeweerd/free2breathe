@@ -5,7 +5,7 @@
 #include "ulp/ULP.h"
 
 /***************************************
- * ULP
+ * Sensors
  ***************************************/
 #define C1 A0
 #define C2 A1
@@ -13,43 +13,8 @@
 #define C4 A3
 #define T1 A7
 
-/***************************************
- * LEDs
- ***************************************/
-#define NUM_LEDS 5
-#define LED_DATA_PIN 8
-#define COLOR_ORDER GRB
-CRGB leds[NUM_LEDS];
-
-f2b::LEDController LEDController = f2b::LEDController(leds, NUM_LEDS);
-
-/***************************************
- * Timing
- ***************************************/
-unsigned long sensorPreviousMillis = 0;
-unsigned long sensorCurrentMillis = 0;
-unsigned long tempPreviousMillis = 0;
-unsigned long tempCurrentMillis = 0;
-
-/***************************************
- * Thermistor
- ***************************************/
-#define TH_PIN A7
-#define TH_NOMINAL 100000
-#define TEMP_NOMINAL 25
-#define NUM_SAMPLES 50
-#define B_COEFF 3950
-#define SERIES_RESISTOR 100000
-uint8_t i;
-float average;
-long int sample_sum;
-float temp = 20;
-
-double runTime = 0.0;
-
 // sensor averaging times, keep these low, so that the ADC read does not
-// overflow 32 bits. For example n = 5 reads ADC 4465 times which could add to
-// 22bit number.
+// overflow 32 bits.
 const int n = 2;  // seconds to read gas sensor
 const int m = 1;  // seconds to read temperature sensor
 const int s = 4;  // seconds to read all sensors, should be greater than n+m+1
@@ -68,6 +33,41 @@ SO2 sensor2(C2, T1, Sf2);
 O3 sensor3(C3, T1, Sf3);
 NO2 sensor4(C4, T1, Sf4);
 
+/***************************************
+ * LEDs
+ ***************************************/
+#define NUM_LEDS 10
+#define LED_DATA_PIN 8
+#define COLOR_ORDER GRB
+CRGB leds[NUM_LEDS];
+
+f2b::LEDController LEDController = f2b::LEDController(leds, NUM_LEDS);
+
+/***************************************
+ * Thermistor
+ ***************************************/
+#define TH_PIN A7
+#define TH_NOMINAL 100000
+#define TEMP_NOMINAL 25
+#define NUM_SAMPLES 50
+#define B_COEFF 3950
+#define SERIES_RESISTOR 100000
+uint8_t i;
+float th_average;
+long int th_sample_sum;
+float temp = 20;
+
+/***************************************
+ * Timing
+ ***************************************/
+unsigned long sensorPreviousMillis = 0;
+unsigned long tempPreviousMillis = 0;
+double runTime = 0.0;
+unsigned long buzzerPreviousMillis = 0;
+int buzzerPeriod = 250;
+bool alarm = false;
+bool buzzerOn = false;
+
 void setup() {
   pinMode(A0, INPUT);
   pinMode(A1, INPUT);
@@ -77,12 +77,16 @@ void setup() {
   pinMode(A5, INPUT);
   pinMode(A6, INPUT);
   pinMode(A7, INPUT);
+  pinMode(3, OUTPUT);
 
   FastLED.addLeds<WS2812B, LED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
       .setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(255);
   FastLED.clear();
   FastLED.show();
+
+  // bitmasking for buzzer
+  TCCR2B = TCCR2B & B11111000 | B00000011;
 
   LEDController.currentLEDState = f2b::LEDState::PULSE_BLUE;
 
@@ -186,20 +190,20 @@ void loop() {
 
   // update temperature
   if (millis() - tempPreviousMillis > 50) {
-    sample_sum += analogRead(T1);
+    th_sample_sum += analogRead(T1);
     i++;
 
     if (i >= NUM_SAMPLES) {
-      average = sample_sum / i;
+      th_average = th_sample_sum / i;
 
       // convert to resistance
-      average = 1023 / average - 1;
-      average = SERIES_RESISTOR / average;
+      th_average = 1023 / th_average - 1;
+      th_average = SERIES_RESISTOR / th_average;
       // Serial.print("Thermistor resistance: ");
-      // Serial.println(average);
+      // Serial.println(th_average);
 
       float steinhart;
-      steinhart = average / TH_NOMINAL;            // (R/Ro)
+      steinhart = th_average / TH_NOMINAL;         // (R/Ro)
       steinhart = log(steinhart);                  // ln(R/Ro)
       steinhart /= B_COEFF;                        // 1/B * ln(R/Ro)
       steinhart += 1.0 / (TEMP_NOMINAL + 273.15);  // + (1/To)
@@ -212,14 +216,14 @@ void loop() {
 
       temp = steinhart;
 
-      sample_sum = 0;
+      th_sample_sum = 0;
       i = 0;
-      average = 0;
+      th_average = 0;
     }
     tempPreviousMillis = millis();
   }
 
-  // loop, read sensor values
+  // read sensor values
   if (millis() - sensorPreviousMillis > (s * 1000)) {
     sensorPreviousMillis = millis();
 
@@ -250,13 +254,31 @@ void loop() {
     Serial.println(sensor1.convertX('M'));
   }
 
-  // if (coPPM > 10) {
-  //   LEDController.currentLEDState = f2b::LEDState::PULSE_RED;
-  // } else if (coPPM > 5) {
-  //   LEDController.currentLEDState = f2b::LEDState::PULSE_YELLOW;
-  // } else {
-  //   LEDController.currentLEDState = f2b::LEDState::LOADING_SPIN;
-  // }
+  float coPPM = sensor1.convertX('M');
+
+  if (coPPM > 0.08) {
+    LEDController.currentLEDState = f2b::LEDState::PULSE_RED;
+    alarm = true;
+  } else if (coPPM > 0.04) {
+    LEDController.currentLEDState = f2b::LEDState::PULSE_YELLOW;
+    alarm = true;
+  } else {
+    LEDController.currentLEDState = f2b::LEDState::PULSE_BLUE;
+    alarm = false;
+  }
 
   LEDController.UpdateLEDs();
+
+  // handle buzzer
+  if (alarm) {
+    if (millis() - buzzerPreviousMillis >= buzzerPeriod) {
+      buzzerOn = !buzzerOn;
+      buzzerPreviousMillis = millis();
+    }
+    if (buzzerOn) {
+      analogWrite(3, 128);
+    } else {
+      analogWrite(3, 0);
+    }
+  }
 }
