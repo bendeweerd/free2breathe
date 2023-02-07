@@ -5,6 +5,15 @@
 #include "ulp/ULP.h"
 
 /***************************************
+ * ULP
+ ***************************************/
+#define C1 A0
+#define C2 A1
+#define C3 A2
+#define C4 A3
+#define T1 A7
+
+/***************************************
  * LEDs
  ***************************************/
 #define NUM_LEDS 5
@@ -17,27 +26,35 @@ f2b::LEDController LEDController = f2b::LEDController(leds, NUM_LEDS);
 /***************************************
  * Timing
  ***************************************/
-unsigned long previousMillis = 0;
-unsigned long currentMillis = 0;
-unsigned waitTime = 100;
+unsigned long sensorPreviousMillis = 0;
+unsigned long sensorCurrentMillis = 0;
+unsigned long tempPreviousMillis = 0;
+unsigned long tempCurrentMillis = 0;
 
 /***************************************
- * ULP
+ * Thermistor
  ***************************************/
-const int C1 = A0;
-const int C2 = A1;
-const int C3 = A2;
-const int C4 = A3;
-const int T1 = A4;
+#define TH_PIN A7
+#define TH_NOMINAL 100000
+#define TEMP_NOMINAL 25
+#define NUM_SAMPLES 50
+#define B_COEFF 3950
+#define SERIES_RESISTOR 100000
+uint8_t i;
+float average;
+long int sample_sum;
+float temp = 20;
 
-// averaging times, keep these low, so that the ADC read does not overflow 32
-// bits. For example n = 5 reads ADC 4465 times which could add to 22bit number.
+double runTime = 0.0;
+
+// sensor averaging times, keep these low, so that the ADC read does not
+// overflow 32 bits. For example n = 5 reads ADC 4465 times which could add to
+// 22bit number.
 const int n = 2;  // seconds to read gas sensor
 const int m = 1;  // seconds to read temperature sensor
 const int s = 4;  // seconds to read all sensors, should be greater than n+m+1
 
-// Sensitivities (as shown on sensor barcode, in nA/ppm):
-// CO: 4.47 nA / ppm
+// Sensitivities (as shown th_i
 // SO2: 39.23 nA / ppm
 // O3: ~ -60 nA +- 10 / ppm
 // NO2: ~ -30 nA +- 10 / ppm
@@ -45,8 +62,6 @@ const float Sf1 = 4.47;
 const float Sf2 = 39.23;
 const float Sf3 = -60;
 const float Sf4 = -30;
-
-unsigned long etime;
 
 CO sensor1(C1, T1, Sf1);
 SO2 sensor2(C2, T1, Sf2);
@@ -128,16 +143,19 @@ void setup() {
   //  }
 
   // Serial.println("Finished Setting Up, Replace Sensor Now.\n");
-  // Serial.println("T1, mV, nA, PPM");
+  Serial.println("\n\ns, temp, mV, nA, PPM");
   // etime = millis();
 
   //...with this code and your measured value of new Vref
   sensor1.pVref_set = 1613.39;
 
-  etime = millis();
+  sensorPreviousMillis = millis();
+  tempPreviousMillis = millis();
 }
 
 void loop() {
+  runTime = millis() / 1000.0;
+
   // if zero command is sent, zero the sensor
   while (Serial.available()) {
     if (Serial.read() == 'Z') {
@@ -166,13 +184,48 @@ void loop() {
     }
   }
 
+  // update temperature
+  if (millis() - tempPreviousMillis > 50) {
+    sample_sum += analogRead(T1);
+    i++;
+
+    if (i >= NUM_SAMPLES) {
+      average = sample_sum / i;
+
+      // convert to resistance
+      average = 1023 / average - 1;
+      average = SERIES_RESISTOR / average;
+      // Serial.print("Thermistor resistance: ");
+      // Serial.println(average);
+
+      float steinhart;
+      steinhart = average / TH_NOMINAL;            // (R/Ro)
+      steinhart = log(steinhart);                  // ln(R/Ro)
+      steinhart /= B_COEFF;                        // 1/B * ln(R/Ro)
+      steinhart += 1.0 / (TEMP_NOMINAL + 273.15);  // + (1/To)
+      steinhart = 1.0 / steinhart;                 // Invert
+      steinhart -= 273.15;                         // convert absolute temp to C
+
+      // Serial.print("Temperature: ");
+      // Serial.print(steinhart);
+      // Serial.println(" *C\n\n");
+
+      temp = steinhart;
+
+      sample_sum = 0;
+      i = 0;
+      average = 0;
+    }
+    tempPreviousMillis = millis();
+  }
+
   // loop, read sensor values
-  if (millis() - etime > (s * 1000)) {
-    etime = millis();
+  if (millis() - sensorPreviousMillis > (s * 1000)) {
+    sensorPreviousMillis = millis();
 
     sensor1.getIgas(n);
-    sensor1.getTemp(m);
-    sensor1.getConc(20);
+    sensor1.setTemp(temp);
+    sensor1.getConc(temp);
 
     // sensor2.getIgas(n);
     // sensor2.getTemp(m);
@@ -186,6 +239,8 @@ void loop() {
     // sensor4.getTemp(m);
     // sensor4.getConc(20);
 
+    Serial.print(runTime);
+    Serial.print(", ");
     Serial.print(sensor1.convertT('C'));  // use 'C' or 'F' for units
     Serial.print(", ");
     Serial.print(sensor1.pVgas);

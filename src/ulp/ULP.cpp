@@ -10,7 +10,7 @@
 #include "Arduino.h"
 
 ULP::ULP(int a, int b, float c) : pCPin(a), pTPin(b), pSf(c) {
-  pTzero = 20.0;
+  pTzero = 25.0;  // TODO: thermistor ref temp
   pIzero = 0.0;
 
   // Temperature Sensor Settings
@@ -25,26 +25,7 @@ ULP::ULP(int a, int b, float c) : pCPin(a), pTPin(b), pSf(c) {
 // float ULP::pVcc = 5.0;
 // float ULP::pVsup = 3.3;
 
-void ULP::getTemp(int n) {
-  // Serial.println("getTemp()");
-  // unsigned long etime, i = 0;
-  // unsigned long anaCounts = 0;
-  // etime = millis() + n * 1000;
-  // do {
-  //   anaCounts = anaCounts + analogRead(pTPin);
-  //   delay(1);
-  //   i++;
-  // } while (millis() < etime);
-  // float Cnts = float(anaCounts) / float(i);
-  // float Volts = Cnts * pVcc / 1024.0;
-
-  // // pT = (pTs / pVsup) * Volts - pTb;  //TODO: replace when have temp
-  // pT = 20;
-  // Serial.print("  Setting temp: ");
-  // Serial.println(pT);
-
-  pT = 20;
-}
+void ULP::setTemp(float t) { pT = t; }
 
 float ULP::convertT(char U) {
   if (U == 'F') {
@@ -169,11 +150,11 @@ void ULP::getIgas(int n) {
 
 void ULP::getConc(float t) {
   // Serial.println("getConc()");
-  // float nA = pInA - pIzero * expI(t - pTzero); //TODO: replace
-  // float Sens = pSf * (1.0 + pTc * (t - 20.0));
-  // pX = nA / Sens * 1000.0;  // output in ppb
+  float nA = pInA - pIzero * expI(t - pTzero);
+  float Sens = pSf * (1.0 + pTc * (t - 20.0));
+  pX = nA / Sens * 1000.0;  // output in ppb
 
-  pX = pInA / pSf * 1000.0;
+  // pX = pInA / pSf * 1000.0;
   // Serial.print("  PPB: ");
   // Serial.println(pX);
 }
