@@ -32,11 +32,15 @@
 30. <s>Generate Gerber files, order boards</s>
 
 ## REV 2
-1. Space LEDs further
-2. Add standoffs for SPEC sensors (non-standard spacing)
-3. Order Arduino standoffs
-4. Verify schematic
-5. Update board layout with new schematic
+1. <s>Space LEDs further</s>
+2. <s>Add standoffs for SPEC sensors (non-standard spacing)</s>
+3. Order Arduino and sensor standoffs
+4. <s>Verify schematic</s>
+5. <s>Update board layout with new schematic</s>
 6. Update BOM
 7. Order new parts
 8. Battery spot-welding
+9. Update schematic and layout with thermistor
+10. Give mechanicals updated .stl file
+11. Ensure buzzer is on PWM pin
+12. Separate sensor grounds from others
