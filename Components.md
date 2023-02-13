@@ -18,3 +18,5 @@
 ## REV 2:
 1. 2x [15 Position headers for Nano](https://www.digikey.com/en/products/detail/sullins-connector-solutions/PPTC151LFBN-RC/810153?utm_adgroup=Rectangular%20Connectors%20-%20Headers%2C%20Receptacles%2C%20Female%20Sockets&utm_source=google&utm_medium=cpc&utm_campaign=Shopping_Product_Connectors%2C%20Interconnects_NEW&utm_term=&utm_content=Rectangular%20Connectors%20-%20Headers%2C%20Receptacles%2C%20Female%20Sockets&gclid=Cj0KCQiAlKmeBhCkARIsAHy7WVs3b6SB1XrEz7m_S7QtjQTP1csOWLjT5X7waPIl4WZ6y9WHHwEIGK8aAiHHEALw_wcB)
 2. 12x [2 position headers for SPEC sensors](https://www.digikey.com/en/products/detail/adam-tech/2RS1-02-G/9833032)
+3. 20x [Football Capacitors](https://www.digikey.com/en/products/detail/rubycon/50YXJ100MT78X11-5/3134938)
+4. 1x [Thermistor](https://www.digikey.com/en/products/detail/mitsubishi-materials-u-s-a-corporation/TH20-3S104FT/12144110)

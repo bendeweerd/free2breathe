@@ -134,24 +134,24 @@ void setup() {
   sensor4.pGain = 499000;
 
   // if you know the V_ref replace the following code...
-  //  Serial.println("Remove CO Sensor.");
-  //  if (sensor1.OCzero(n)) {
-  //    Serial.print("Vref new = ");
-  //    Serial.println(sensor1.pVref_set);
-  //  } else {
-  //    Serial.println("Recheck Settings, Zero out of range");
-  //    while (1) {
-  //      Serial.println(analogRead(A0));
-  //      delay(1000);
-  //    }sensor1
-  //  }
+  Serial.println("Remove Sensor.");
+  if (sensor1.OCzero(n)) {
+    Serial.print("Vref new = ");
+    Serial.println(sensor1.pVref_set);
+  } else {
+    Serial.println("Recheck Settings, Zero out of range");
+    while (1) {
+      Serial.println(analogRead(A0));
+      delay(1000);
+    }
+  }
 
   // Serial.println("Finished Setting Up, Replace Sensor Now.\n");
   Serial.println("\n\ns, temp, mV, nA, PPM");
   // etime = millis();
 
   //...with this code and your measured value of new Vref
-  sensor1.pVref_set = 1613.39;
+  // sensor1.pVref_set = 1642.04;
 
   sensorPreviousMillis = millis();
   tempPreviousMillis = millis();
@@ -254,31 +254,31 @@ void loop() {
     Serial.println(sensor1.convertX('M'));
   }
 
-  float coPPM = sensor1.convertX('M');
+  // float coPPM = sensor1.convertX('M');
 
-  if (coPPM > 0.08) {
-    LEDController.currentLEDState = f2b::LEDState::PULSE_RED;
-    alarm = true;
-  } else if (coPPM > 0.04) {
-    LEDController.currentLEDState = f2b::LEDState::PULSE_YELLOW;
-    alarm = true;
-  } else {
-    LEDController.currentLEDState = f2b::LEDState::PULSE_BLUE;
-    alarm = false;
-  }
+  // if (coPPM > 0.08) {
+  //   LEDController.currentLEDState = f2b::LEDState::PULSE_RED;
+  //   alarm = true;
+  // } else if (coPPM > 0.04) {
+  //   LEDController.currentLEDState = f2b::LEDState::PULSE_YELLOW;
+  //   alarm = true;
+  // } else {
+  //   LEDController.currentLEDState = f2b::LEDState::PULSE_BLUE;
+  //   alarm = false;
+  // }
 
-  LEDController.UpdateLEDs();
+  // LEDController.UpdateLEDs();
 
-  // handle buzzer
-  if (alarm) {
-    if (millis() - buzzerPreviousMillis >= buzzerPeriod) {
-      buzzerOn = !buzzerOn;
-      buzzerPreviousMillis = millis();
-    }
-    if (buzzerOn) {
-      analogWrite(3, 128);
-    } else {
-      analogWrite(3, 0);
-    }
-  }
+  // // handle buzzer
+  // if (alarm) {
+  //   if (millis() - buzzerPreviousMillis >= buzzerPeriod) {
+  //     buzzerOn = !buzzerOn;
+  //     buzzerPreviousMillis = millis();
+  //   }
+  //   if (buzzerOn) {
+  //     analogWrite(3, 128);
+  //   } else {
+  //     analogWrite(3, 0);
+  //   }
+  // }
 }

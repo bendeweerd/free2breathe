@@ -40,7 +40,10 @@
 6. Update BOM
 7. Order new parts
 8. Battery spot-welding
-9. Update schematic and layout with thermistor
-10. Give mechanicals updated .stl file
-11. Ensure buzzer is on PWM pin
-12. Separate sensor grounds from others
+9. <s>Update schematic and layout with thermistor (on Analog Input)</s>
+10. Give mechanicals updated .step file
+11. <s>Ensure buzzer is on PWM pin</s> (9)
+12. <s>Separate sensor grounds from others</s> (Separated LEDs and Buzzer instead)
+13. <s>Add solder/test points for Arduino supply voltage</s>
+14. Test Power System
+15. <s>Add buzzer resistor</s>
