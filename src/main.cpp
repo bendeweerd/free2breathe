@@ -134,24 +134,24 @@ void setup() {
   sensor4.pGain = 499000;
 
   // if you know the V_ref replace the following code...
-  Serial.println("Remove Sensor.");
-  if (sensor1.OCzero(n)) {
-    Serial.print("Vref new = ");
-    Serial.println(sensor1.pVref_set);
-  } else {
-    Serial.println("Recheck Settings, Zero out of range");
-    while (1) {
-      Serial.println(analogRead(A0));
-      delay(1000);
-    }
-  }
+  // Serial.println("Remove Sensor.");
+  // if (sensor1.OCzero(n)) {
+  //   Serial.print("Vref new = ");
+  //   Serial.println(sensor1.pVref_set);
+  // } else {
+  //   Serial.println("Recheck Settings, Zero out of range");
+  //   while (1) {
+  //     Serial.println(analogRead(A0));
+  //     delay(1000);
+  //   }
+  // }
 
-  // Serial.println("Finished Setting Up, Replace Sensor Now.\n");
-  Serial.println("\n\ns, temp, mV, nA, PPM");
+  // Serial.println("Finished Setting Up, Replace Sensor Now.\n");2
+  Serial.println("\n\ns, analogRead(), temp, mV, nA, PPM");
   // etime = millis();
 
   //...with this code and your measured value of new Vref
-  // sensor1.pVref_set = 1642.04;
+  sensor1.pVref_set = 1645.91;
 
   sensorPreviousMillis = millis();
   tempPreviousMillis = millis();
@@ -244,6 +244,8 @@ void loop() {
     // sensor4.getConc(20);
 
     Serial.print(runTime);
+    Serial.print(", ");
+    Serial.print(analogRead(A0));
     Serial.print(", ");
     Serial.print(sensor1.convertT('C'));  // use 'C' or 'F' for units
     Serial.print(", ");
