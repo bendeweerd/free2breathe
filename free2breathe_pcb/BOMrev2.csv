@@ -1,0 +1,53 @@
+Source:,,C:\Users\legen\OneDrive\Documents\SeniorDesign\free2breathe\free2breathe_pcb\free2breathe_pcb.kicad_sch,,,,
+Date:,,2/20/2023 15:13,,,,
+Tool:,,Eeschema (6.0.9),,,,
+Generator:,,C:\Program Files\KiCad\6.0\bin\scripting\plugins/bom_csv_grouped_by_value_with_fp.py,,,,
+Component Count:,,111,,,,
+Ref,Qnty to Order,Qnty,Value,Cmp name,Footprint,Description
+"A1, ",,1,Arduino_Nano_v3.x,Arduino_Nano_v3.x,Module:Arduino_Nano,Arduino Nano v3.x
+"BT1, BT2, BT3, ",,3,Battery_Cell,Battery_Cell,switch:switch_pad,Single-cell battery
+"C1, C11, C13, ",,3,10uF 25V,C,Capacitor_SMD:C_0603_1608Metric,Unpolarized capacitor
+"C2, C7, C8, C9, C10, ",,5,22uF 25V,C,Capacitor_SMD:C_0805_2012Metric,Unpolarized capacitor
+"C3, C6, C12, ",6,3,100nF 25V,C,Capacitor_SMD:C_0603_1608Metric,Unpolarized capacitor
+"C4, C5, ",,2,2.2uF 16V,C,Capacitor_SMD:C_0603_1608Metric,Unpolarized capacitor
+"C14, C15, C16, C17, ",,4,22uF 16V,C,Capacitor_SMD:C_0603_1608Metric,Unpolarized capacitor
+"C18, C19, C24, C25, ",8,4,1u,C,Capacitor_SMD:C_0603_1608Metric,Unpolarized capacitor
+"C20, C21, C22, C23, C26, C27, C28, C29, C30, C31, C32, C33, ",20,12,0.1u,C,Capacitor_SMD:C_0603_1608Metric,Unpolarized capacitor
+"D1, ",,1,Status_LED_1,LED,LED_THT:LED_D3.0mm,Light emitting diode
+"D2, ",,1,Status_LED_2,LED,LED_THT:LED_D3.0mm,Light emitting diode
+"D3, ",,1,Status_LED_3,LED,LED_THT:LED_D3.0mm,Light emitting diode
+"D4, ",,1,Status_LED_4,LED,LED_THT:LED_D3.0mm,Light emitting diode
+"D5, D6, D7, D8, ",,4,LED,LED,LED_SMD:LED_0603_1608Metric,Light emitting diode
+"H1, H2, H3, H4, H5, ",,5,MountingHole_Pad,MountingHole_Pad,MountingHole:MountingHole_3.2mm_M3_Pad_Via,Mounting Hole with connection
+"J1, ",2,1,USB4110-GF-A_REVB,USB4110-GF-A_REVB,components:GCT_USB4110-GF-A_REVB,
+"J2, ",,1,LED_Connector,Conn_01x03_Female,Connector_JST:JST_PH_S3B-PH-K_1x03_P2.00mm_Horizontal,"Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+"J3, ",,1,Alarm_Connector,Conn_01x02_Female,alarm:AT_1127_ST_2_R_Alarm,"Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+"J4, ",,1,Conn_01x02_Female,Conn_01x02_Female,switch:switch_pad,"Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
+"L1, ",,1,2.2uH,L,components:IND_AMPLA5030S2R2MT,Inductor
+"Q1, ",,1,AO3401A,AO3401A,Package_TO_SOT_SMD:SOT-23,"-4.0A Id, -30V Vds, P-Channel MOSFET, SOT-23"
+"Q2, ",,1,DMN3404L,DMN3404L,Package_TO_SOT_SMD:SOT-23,"5.8A Id, 30V Vds, N-Channel MOSFET, SOT-23"
+"R1, ",,1,10k,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R2, ",,1,10m,R,Resistor_SMD:R_0805_2012Metric,Resistor
+"R3, ",,1,100k 0.1%,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R4, R5, R6, R8, ",,4,220,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R7, R9, ",,2,100,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R10, ",,1,NC,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R11, ",,1,82k 1%,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R12, ",2,1,2k,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R13, R14, R16, R17, R20, R21, R26, R28, R29, R31, R34, R35, ",24,12,1M,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R15, R30, ",4,2,16.2k,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R18, R19, R32, R33, R24, R39, R42, ",14,7,100K,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R22, R23, R37, R38, ",8,4,49.9,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R25, R40, ",4,2,499k,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R27, ",2,1,143k,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R36, ",,1,14k 0.1%,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"R41, ",,1,10,R,Resistor_SMD:R_0603_1608Metric,Resistor
+"S1, ",2,1,EG1213,EG1213,components:SW_EG1213,
+"TH1, TH2, ",2,2,100k@25c,Thermistor,Resistor_SMD:R_0805_2012Metric,Temperature dependent resistor
+"U1, ",,1,IP5328,IP5328,Package_DFN_QFN:QFN-40-1EP_6x6mm_P0.5mm_EP4.6x4.6mm,
+"U2, U3, U6, U7, ",,4,MCP6044-E/P,MCP6044-E/P,components:DIP254P762X533-14,
+"U4, ",,1,O3 Sensor,110-102,components:XDCR_110-102,
+"U5, ",,1,CO Sensor,110-102,components:XDCR_110-102,
+"U8, ",,1,SO2 Sensor,110-102,components:XDCR_110-102,
+"U9, ",,1,NO2 Sensor,110-102,components:XDCR_110-102,
+,,,,,,
