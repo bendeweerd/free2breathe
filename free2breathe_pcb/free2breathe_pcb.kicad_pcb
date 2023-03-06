@@ -210,7 +210,7 @@
   (net 120 "unconnected-(U8-Pad3)")
   (net 121 "Net-(J3-Pad1)")
 
-  (footprint "alignment:0.125_in_hole" (layer "F.Cu")
+  (footprint "alignment:0.125_in_hole" locked (layer "F.Cu")
     (tedit 0) (tstamp 00d88269-30b1-4e33-a2c2-4d368d164a47)
     (at 148.6 171.05)
     (attr through_hole)
@@ -226,7 +226,7 @@
       (effects (font (size 1 1) (thickness 0.15)))
       (tstamp 2b8f7e78-5672-48be-89e3-3e4c95dcefa5)
     )
-    (pad "1" thru_hole circle (at -8.6 -0.05) (size 4 4) (drill 3.275) (layers *.Cu *.Mask "F.Paste")
+    (pad "1" thru_hole circle locked (at -8.6 -0.05) (size 4 4) (drill 3.275) (layers *.Cu *.Mask "F.Paste")
       (solder_mask_margin 1) (tstamp 7385a2cc-aa1e-4116-b1b3-0fb2d529d2f2))
   )
 
@@ -336,7 +336,7 @@
     )
   )
 
-  (footprint "alignment:0.125_in_hole" (layer "F.Cu")
+  (footprint "alignment:0.125_in_hole" locked (layer "F.Cu")
     (tedit 0) (tstamp 077711f9-6b9b-42d7-bb5e-b11b1a43a9db)
     (at 135.35 43.85)
     (attr through_hole)
@@ -352,7 +352,7 @@
       (effects (font (size 1 1) (thickness 0.15)))
       (tstamp 446f00bf-5e60-488b-bde7-5925a9122055)
     )
-    (pad "1" thru_hole circle (at -0.35 0.65) (size 4 4) (drill 3.275) (layers *.Cu *.Mask "F.Paste")
+    (pad "1" thru_hole circle locked (at -0.35 0.65) (size 4 4) (drill 3.275) (layers *.Cu *.Mask "F.Paste")
       (solder_mask_margin 1) (tstamp 69ada22f-1686-481a-a128-4031f07816ae))
   )
 
@@ -3815,7 +3815,7 @@
     )
   )
 
-  (footprint "alignment:0.125_in_hole" (layer "F.Cu")
+  (footprint "alignment:0.125_in_hole" locked (layer "F.Cu")
     (tedit 0) (tstamp 6c3f352a-d7dd-4332-9d50-b083de0ac824)
     (at 104.8 45.1)
     (attr through_hole)
@@ -3831,7 +3831,7 @@
       (effects (font (size 1 1) (thickness 0.15)))
       (tstamp b883e19f-3564-473b-9641-6f99ec751a24)
     )
-    (pad "1" thru_hole circle (at 0.2 -0.6) (size 4 4) (drill 3.275) (layers *.Cu *.Mask "F.Paste")
+    (pad "1" thru_hole circle locked (at 0.2 -0.6) (size 4 4) (drill 3.275) (layers *.Cu *.Mask "F.Paste")
       (solder_mask_margin 1) (tstamp daff00f6-09a8-461f-8378-db27d4c9b1aa))
   )
 
@@ -5677,7 +5677,7 @@
       (effects (font (size 1 1) (thickness 0.15)))
       (tstamp 70b9f891-6a85-438e-9173-97a697ba2956)
     )
-    (pad "1" thru_hole circle (at 9.1 0.95) (size 4 4) (drill 3.275) (layers *.Cu *.Mask "F.Paste")
+    (pad "1" thru_hole circle locked (at 9.1 0.95) (size 4 4) (drill 3.275) (layers *.Cu *.Mask "F.Paste")
       (solder_mask_margin 1) (tstamp 52b14838-6e96-4aaf-8177-6d765c510323))
   )
 
