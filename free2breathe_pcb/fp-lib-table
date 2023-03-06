@@ -2,4 +2,5 @@
   (lib (name "components")(type "KiCad")(uri "${KIPRJMOD}/components")(options "")(descr ""))
   (lib (name "alarm")(type "KiCad")(uri "${KIPRJMOD}/components/alarm.pretty")(options "")(descr ""))
   (lib (name "switch")(type "KiCad")(uri "${KIPRJMOD}/components/switch.pretty")(options "")(descr ""))
+  (lib (name "alignment")(type "KiCad")(uri "${KIPRJMOD}/components/alignment.pretty")(options "")(descr ""))
 )
