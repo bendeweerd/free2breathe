@@ -11,7 +11,9 @@
 #define C2 A1
 #define C3 A2
 #define C4 A3
-#define T1 A7
+#define T1 A4
+
+#define AlarmPin 9
 
 // sensor averaging times, keep these low, so that the ADC read does not
 // overflow 32 bits.
@@ -36,7 +38,12 @@ NO2 sensor4(C4, T1, Sf4);
 /***************************************
  * LEDs
  ***************************************/
-#define NUM_LEDS 10
+#define StatusLED1 10
+#define StatusLED2 11
+#define StatusLED3 12
+#define StatusLED4 13
+
+#define NUM_LEDS 25
 #define LED_DATA_PIN 8
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
@@ -78,6 +85,10 @@ void setup() {
   pinMode(A6, INPUT);
   pinMode(A7, INPUT);
   pinMode(3, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(13, OUTPUT);
 
   FastLED.addLeds<WS2812B, LED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
       .setCorrection(TypicalLEDStrip);
@@ -225,6 +236,12 @@ void loop() {
 
   // read sensor values
   if (millis() - sensorPreviousMillis > (s * 1000)) {
+    // flash status LEDs
+    digitalWrite(StatusLED1, !digitalRead(StatusLED1));
+    digitalWrite(StatusLED2, !digitalRead(StatusLED2));
+    digitalWrite(StatusLED3, !digitalRead(StatusLED3));
+    digitalWrite(StatusLED4, !digitalRead(StatusLED4));
+
     sensorPreviousMillis = millis();
 
     sensor1.getIgas(n);
@@ -269,7 +286,7 @@ void loop() {
   //   alarm = false;
   // }
 
-  // LEDController.UpdateLEDs();
+  LEDController.UpdateLEDs();
 
   // // handle buzzer
   // if (alarm) {
@@ -283,4 +300,14 @@ void loop() {
   //     analogWrite(3, 0);
   //   }
   // }
+
+  if (millis() - buzzerPreviousMillis >= buzzerPeriod) {
+    buzzerOn = !buzzerOn;
+    buzzerPreviousMillis = millis();
+  }
+  if (buzzerOn) {
+    analogWrite(AlarmPin, 128);
+  } else {
+    analogWrite(AlarmPin, 0);
+  }
 }
