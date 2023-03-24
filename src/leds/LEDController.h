@@ -15,6 +15,9 @@ enum LEDState {
   SOLID_YELLOW,
   PULSE_YELLOW,
   LOADING_SPIN,
+  OFF,
+  SOLID_GREEN,
+  SOLID_BLUE,
 };
 
 /**
@@ -67,6 +70,8 @@ class LEDController {
     num_leds = numLeds;
   }
 
+  void SetNumLEDs(unsigned num) { num_leds = num; }
+
   /**
    * @brief Update LED strip with current state and brightness
    */
@@ -115,6 +120,24 @@ class LEDController {
         g = 0;
         b = 255;
         currentLEDEffect = LOADING;
+        break;
+      case OFF:
+        r = 0;
+        g = 0;
+        b = 0;
+        currentLEDEffect = SOLID;
+        break;
+      case SOLID_GREEN:
+        r = 0;
+        g = 255;
+        b = 0;
+        currentLEDEffect = SOLID;
+        break;
+      case SOLID_BLUE:
+        r = 0;
+        g = 0;
+        b = 255;
+        currentLEDEffect = SOLID;
         break;
     }
 
