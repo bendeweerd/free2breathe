@@ -10,7 +10,7 @@
 #include "Arduino.h"
 
 ULP::ULP(int a, int b, float c) : pCPin(a), pTPin(b), pSf(c) {
-  pTzero = 25.0;  // TODO: thermistor ref temp
+  pTzero = 25.0;
   pIzero = 0.0;
 
   // Temperature Sensor Settings

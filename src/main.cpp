@@ -5,49 +5,67 @@
 #include "ulp/ULP.h"
 
 /***************************************
- * Sensors
+ * Pin Assignments
  ***************************************/
-#define C1 A0
-#define C2 A1
-#define C3 A2
-#define C4 A3
-#define T1 A4
+
+#define CO_READ_PIN A0
+#define SO2_READ_PIN A1
+#define O3_READ_PIN A2
+#define NO2_READ_PIN A3
+#define THERMISTOR_READ_PIN A4
+
+#define CO_STATUS_LED 13
+#define SO2_STATUS_LED 12
+#define O3_STATUS_LED 11
+#define NO2_STATUS_LED 10
+
+#define LED_DATA_PIN 8
 
 #define ALARM_PIN 9
 
-// sensor averaging times, keep these low, so that the ADC read does not
-// overflow 32 bits.
+/***************************************
+ * Sensors
+ ***************************************/
+
+// sensor averaging times
 const int n = 2;  // seconds to read gas sensor
 const int s = 3;  // seconds to read all sensors, should be greater than n+m+1
 
 // Sensitivities (as shown on sensor barcodes)
 // CO: 4.47 nA / ppm
 // SO2: 39.23 nA / ppm
-// O3: ~ -60 nA +- 10 / ppm
-// NO2: ~ -30 nA +- 10 / ppm
+// O3: -60 nA +- 10 / ppm
+// NO2: -30 nA +- 10 / ppm
 const float Sf1 = 4.47;
 const float Sf2 = 39.23;
 const float Sf3 = -60;
 const float Sf4 = -30;
 
-CO sensor1(C1, T1, Sf1);
-SO2 sensor2(C2, T1, Sf2);
-O3 sensor3(C3, T1, Sf3);
-NO2 sensor4(C4, T1, Sf4);
+// TODO: update from specs
+const unsigned coWorryConcentration = 9;
+const unsigned coDangerConcentration = 200;
+const unsigned so2WorryConcentration = 10000;
+const unsigned so2DangerConcentration = 10000;
+const unsigned o3WorryConcentration = 10000;
+const unsigned o3DangerConcentration = 10000;
+const unsigned no2WorryConcentration = 10000;
+const unsigned no2DangerConcentration = 10000;
 
-#define CO_WORRY 9
-#define CO_DANGER 200
+bool coPresent = false;
+bool so2Present = false;
+bool o3Present = false;
+bool no2Present = false;
+
+CO COsensor(CO_READ_PIN, THERMISTOR_READ_PIN, Sf1);
+SO2 SO2sensor(SO2_READ_PIN, THERMISTOR_READ_PIN, Sf2);
+O3 O3sensor(O3_READ_PIN, THERMISTOR_READ_PIN, Sf3);
+NO2 NO2sensor(NO2_READ_PIN, THERMISTOR_READ_PIN, Sf4);
 
 /***************************************
  * LEDs
  ***************************************/
-#define STATUS_LED_1 13
-#define STATUS_LED_2 12
-#define STATUS_LED_3 11
-#define STATUS_LED_4 10
 
 #define NUM_LEDS 25
-#define LED_DATA_PIN 8
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
 
@@ -56,46 +74,49 @@ f2b::LEDController LEDController = f2b::LEDController(leds, NUM_LEDS);
 /***************************************
  * Thermistor
  ***************************************/
-#define TH_NOMINAL_RES 100000
-#define TH_TEMP_NOMINAL 25
-#define TH_NUM_SAMPLES 50
-#define TH_B_COEFF 3760
-#define TH_SERIES_RES 100000
-uint8_t i;
-float th_average;
-long int th_sample_sum;
+const unsigned long thermistorNominalRes = 100000;
+const unsigned long thermistorSeriesResistor = 100000;
+const unsigned thermistorTempNominal = 25;
+const unsigned thermistorNumSamples = 50;
+const unsigned thermistorBetaCoefficient = 3760;
+
+unsigned i;
+float thAverage;
+long int thSampleSum;
 float temp = 20.0;
 
 /***************************************
  * Timing
  ***************************************/
-unsigned long sensorPreviousMillis = 0;
-unsigned long tempPreviousMillis = 0;
 double runTime = 0.0;
+unsigned long sensorPreviousMillis = 0;
+unsigned sensorPollPeriod = 10000;
+unsigned long tempPreviousMillis = 0;
+unsigned tempPeriod = 50;
 unsigned long buzzerPreviousMillis = 0;
 unsigned buzzerPeriod = 250;
 bool alarm = false;
 bool buzzerOn = false;
 
 void setup() {
-  pinMode(C1, INPUT);
-  pinMode(C2, INPUT);
-  pinMode(C3, INPUT);
-  pinMode(C4, INPUT);
-  pinMode(T1, INPUT);
+  pinMode(CO_READ_PIN, INPUT);
+  pinMode(SO2_READ_PIN, INPUT);
+  pinMode(O3_READ_PIN, INPUT);
+  pinMode(NO2_READ_PIN, INPUT);
+  pinMode(THERMISTOR_READ_PIN, INPUT);
 
-  pinMode(STATUS_LED_1, OUTPUT);
-  pinMode(STATUS_LED_2, OUTPUT);
-  pinMode(STATUS_LED_3, OUTPUT);
-  pinMode(STATUS_LED_4, OUTPUT);
+  pinMode(CO_STATUS_LED, OUTPUT);
+  pinMode(SO2_STATUS_LED, OUTPUT);
+  pinMode(O3_STATUS_LED, OUTPUT);
+  pinMode(NO2_STATUS_LED, OUTPUT);
 
   pinMode(LED_DATA_PIN, OUTPUT);
   pinMode(ALARM_PIN, OUTPUT);
 
-  digitalWrite(STATUS_LED_1, LOW);
-  digitalWrite(STATUS_LED_2, LOW);
-  digitalWrite(STATUS_LED_3, LOW);
-  digitalWrite(STATUS_LED_4, LOW);
+  digitalWrite(CO_STATUS_LED, LOW);
+  digitalWrite(SO2_STATUS_LED, LOW);
+  digitalWrite(O3_STATUS_LED, LOW);
+  digitalWrite(NO2_STATUS_LED, LOW);
 
   FastLED.addLeds<WS2812B, LED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
       .setCorrection(TypicalLEDStrip);
@@ -104,48 +125,48 @@ void setup() {
   LEDController.UpdateLEDs();
 
   // bitmasking to set buzzer PWM frequency
-  TCCR2B = TCCR2B & B11111000 | B00000011;
+  TCCR2B = ((TCCR2B & B11111000) | B00000011);
 
-  sensor1.pVcc = 4.993;  // TODO: update if micro or power supply changes
-  sensor1.pVsup = 3.293;
-  sensor2.pVcc = sensor1.pVcc;
-  sensor2.pVsup = sensor1.pVsup;
-  sensor3.pVcc = sensor1.pVcc;
-  sensor3.pVsup = sensor1.pVsup;
-  sensor4.pVcc = sensor1.pVcc;
-  sensor4.pVsup = sensor1.pVsup;
+  COsensor.pVcc = 4.993;  // TODO: update if micro or power supply changes
+  COsensor.pVsup = 3.293;
+  SO2sensor.pVcc = COsensor.pVcc;
+  SO2sensor.pVsup = COsensor.pVsup;
+  O3sensor.pVcc = COsensor.pVcc;
+  O3sensor.pVsup = COsensor.pVsup;
+  NO2sensor.pVcc = COsensor.pVcc;
+  NO2sensor.pVsup = COsensor.pVsup;
 
   // CO
   long int CO_R2 = 1999;  // spec 2k
   float CO_bias = 3.0;
-  sensor1.setVref(CO_bias, CO_R2);
-  sensor1.pGain = 99900;  // resistor R6, spec 100k
+  COsensor.setVref(CO_bias, CO_R2);
+  COsensor.pGain = 99900;  // resistor R6, spec 100k
 
   // SO2
   long int SO2_R2 = 134100;  // spec 143k
   float SO2_bias = 217.0;
-  sensor2.setVref(SO2_bias, SO2_R2);
-  sensor2.pGain = 99600;  // spec 100k
+  SO2sensor.setVref(SO2_bias, SO2_R2);
+  SO2sensor.pGain = 99600;  // spec 100k
 
   // O3
   long int O3_R2 = 16000;  // spec 16.2k
   float O3_bias = -25;
-  sensor3.setVref(O3_bias, O3_R2);
-  sensor3.pGain = 498000;  // spec 499k
+  O3sensor.setVref(O3_bias, O3_R2);
+  O3sensor.pGain = 498000;  // spec 499k
 
   // NO2
   long int NO2_R2 = 16070;  // spec 16.2k
   float NO2_bias = -25;
-  sensor4.setVref(NO2_bias, NO2_R2);
-  sensor4.pGain = 497000;  // spec 499k
+  NO2sensor.setVref(NO2_bias, NO2_R2);
+  NO2sensor.pGain = 497000;  // spec 499k
 
   Serial.begin(9600);
 
   // if you know the V_ref replace the following code...
   // Serial.println("Remove Sensor.");
-  // if (sensor2.OCzero(n)) {
+  // if (SO2sensor.OCzero(n)) {
   //   Serial.print("Vref new = ");
-  //   Serial.println(sensor2.pVref_set);
+  //   Serial.println(SO2sensor.pVref_set);
   // } else {
   //   Serial.println("Recheck Settings, Zero out of range");
   //   while (1) {
@@ -156,19 +177,19 @@ void setup() {
   // Serial.println("Finished Setting Up, Replace Sensor Now.\n");2
 
   //...with this code and your measured value of new Vref
-  sensor1.pVref_set = 1638.31;
-  // sensor2.pVref_set = ;
-  // sensor3.pVref_set = ;
-  // sensor4.pVref_set = ;
+  COsensor.pVref_set = 1638.31;
+  // SO2sensor.pVref_set = ;
+  // O3sensor.pVref_set = ;
+  // NO2sensor.pVref_set = ;
 
   Serial.println("\nSetting Up.");
 
   Serial.print("  Vsup for all sensors = ");
-  Serial.println(sensor1.pVsup);
+  Serial.println(COsensor.pVsup);
   Serial.print("  Vcc for all sensors = ");
-  Serial.println(sensor1.pVcc);
+  Serial.println(COsensor.pVcc);
   Serial.print("  Vref for sensor 1 = ");
-  Serial.println(sensor1.pVref);
+  Serial.println(COsensor.pVref);
 
   Serial.println("\nSystem starting up, please wait for stabilization.");
   Serial.println("\n\nData Log:");
@@ -182,110 +203,128 @@ void setup() {
     LEDController.currentLEDState = f2b::LEDState::SOLID_BLUE;
     LEDController.SetNumLEDs(i);
     LEDController.UpdateLEDs();
-    delay(1000);
+    // TODO: update for desired startup time
+    delay(100);
   }
 }
 
 void loop() {
   runTime = millis() / 1000.0;
 
-  // update temperature, sample every 50 milliseconds
-  if (millis() - tempPreviousMillis > 50) {
-    th_sample_sum += analogRead(T1);
+  // update temperature reading
+  if (millis() - tempPreviousMillis > tempPeriod) {
+    thSampleSum += analogRead(THERMISTOR_READ_PIN);
     i++;
 
-    if (i >= TH_NUM_SAMPLES) {
-      th_average = th_sample_sum / i;
+    if (i >= thermistorNumSamples) {
+      thAverage = thSampleSum / i;
 
       // convert to resistance
-      th_average = 1023 / th_average - 1;
-      th_average = TH_SERIES_RES / th_average;
+      thAverage = 1023 / thAverage - 1;
+      thAverage = thermistorSeriesResistor / thAverage;
 
+      // convert resistance to temperature - see
+      // https://learn.adafruit.com/thermistor/using-a-thermistor
       float steinhart;
-      steinhart = th_average / TH_NOMINAL_RES;        // (R/Ro)
-      steinhart = log(steinhart);                     // ln(R/Ro)
-      steinhart /= TH_B_COEFF;                        // 1/B * ln(R/Ro)
-      steinhart += 1.0 / (TH_TEMP_NOMINAL + 273.15);  // + (1/To)
-      steinhart = 1.0 / steinhart;                    // Invert
+      steinhart = thAverage / thermistorNominalRes;         // (R/Ro)
+      steinhart = log(steinhart);                           // ln(R/Ro)
+      steinhart /= thermistorBetaCoefficient;               // 1/B * ln(R/Ro)
+      steinhart += 1.0 / (thermistorTempNominal + 273.15);  // + (1/To)
+      steinhart = 1.0 / steinhart;                          // Invert
       steinhart -= 273.15;  // convert absolute temp to C
 
       temp = steinhart;
 
-      th_sample_sum = 0;
+      thSampleSum = 0;
+      thAverage = 0;
       i = 0;
-      th_average = 0;
     }
     tempPreviousMillis = millis();
   }
 
-  // read sensor values
-  if (millis() - sensorPreviousMillis > (10000)) {
-    // flash status LEDs
-    // digitalWrite(STATUS_LED_1, !digitalRead(STATUS_LED_1));
-    // digitalWrite(STATUS_LED_2, !digitalRead(STATUS_LED_2))2;
-    // digitalWrite(STATUS_LED_3, !digitalRead(STATUS_LED_3));
-    // digitalWrite(STATUS_LED_4, !digitalRead(STATUS_LED_4));
-
+  // update sensor readings
+  if (millis() - sensorPreviousMillis > (sensorPollPeriod)) {
     sensorPreviousMillis = millis();
 
+    // turn off lights and alarm to reduce noise while reading
     LEDController.currentLEDState = f2b::LEDState::OFF;
     LEDController.UpdateLEDs();
-    digitalWrite(STATUS_LED_1, LOW);
+    digitalWrite(CO_STATUS_LED, LOW);
+    digitalWrite(SO2_STATUS_LED, LOW);
+    digitalWrite(O3_STATUS_LED, LOW);
+    digitalWrite(NO2_STATUS_LED, LOW);
     analogWrite(ALARM_PIN, 0);
 
-    sensor1.getIgas(n);
-    sensor1.setTemp(temp);
-    sensor1.getConc(temp);
+    // delay to prevent effect of current draw
+    delay(1000);
+
+    COsensor.getIgas(n);
+    COsensor.setTemp(temp);
+    COsensor.getConc(temp);
+
+    // SO2sensor.getIgas(n);
+    // SO2sensor.getTemp(m);
+    // SO2sensor.getConc(20);
+
+    // O3sensor.getIgas(n);
+    // O3sensor.getTemp(m);
+    // O3sensor.getConc(20);
+
+    // NO2sensor.getIgas(n);
+    // NO2sensor.getTemp(m);
+    // NO2sensor.getConc(20);
 
     // scale reading based on test data
-    float ppm = sensor1.convertX('B') / 1.5;
+    // TODO: determine scale for each gas
+    float COppm = COsensor.convertX('B') / 1.5;
+    float SO2ppm = 0;
+    float O3ppm = 0;
+    float NO2ppm = 0;
 
-    if (ppm > CO_DANGER) {
+    alarm = false;
+    if (COppm >= coDangerConcentration || SO2ppm >= so2DangerConcentration ||
+        O3ppm >= o3DangerConcentration || NO2ppm >= no2DangerConcentration) {
+      alarm = true;
+    }
+
+    coPresent = false;
+    so2Present = false;
+    o3Present = false;
+    no2Present = false;
+
+    if (COppm > coWorryConcentration) {
+      coPresent = true;
+    }
+    // if (SO2ppm > so2WorryConcentration) {
+    //   so2Present = true;
+    // }
+    // if (O3ppm > o3WorryConcentration) {
+    //   o3Present = true;
+    // }
+    // if (no2Present > no2WorryConcentration) {
+    //   no2Present = true;
+    // }
+
+    if (alarm) {
       LEDController.currentLEDState = f2b::LEDState::SOLID_RED;
-      alarm = true;
-    } else if (ppm > CO_WORRY) {
+    } else if (coPresent || so2Present || o3Present || no2Present) {
       LEDController.currentLEDState = f2b::LEDState::SOLID_YELLOW;
-      alarm = true;
     } else {
       LEDController.currentLEDState = f2b::LEDState::SOLID_GREEN;
-      alarm = false;
     }
-    // LEDController.SetNumLEDs(map((long)ppm, -10, 200, 0, 25));
+
+    digitalWrite(CO_STATUS_LED, coPresent);
+    digitalWrite(SO2_STATUS_LED, so2Present);
+    digitalWrite(O3_STATUS_LED, o3Present);
+    digitalWrite(NO2_STATUS_LED, no2Present);
 
     LEDController.UpdateLEDs();
-
-    // sensor2.getIgas(n);
-    // sensor2.getTemp(m);
-    // sensor2.getConc(20);
-
-    // sensor3.getIgas(n);
-    // sensor3.getTemp(m);
-    // sensor3.getConc(20);
-
-    // sensor4.getIgas(n);
-    // sensor4.getTemp(m);
-    // sensor4.getConc(20);
 
     Serial.print(runTime);
     Serial.print(", ");
-    // Serial.print(analogRead(A0));
-    // Serial.print(", ");
     Serial.print(temp);
     Serial.print(", ");
-    // Serial.print(sensor1.pVgas);
-    // Serial.print(", ");
-    // Serial.print(sensor1.pInA);
-    // Serial.print(", ");
-    Serial.println(ppm);
-    // Serial.print(sensor1.convertX('B'));
-    // Serial.print(", ");
-    // Serial.println(sensor1.convertX('M'));
-
-    // delay(1000);
-    // digitalWrite(STATUS_LED_1, HIGH);
-    // digitalWrite(STATUS_LED_2, HIGH);
-    // digitalWrite(STATUS_LED_3, HIGH);
-    // digitalWrite(STATUS_LED_4, HIGH);
+    Serial.println(COppm);
   }
 
   if (alarm) {
@@ -298,11 +337,11 @@ void loop() {
     } else {
       analogWrite(ALARM_PIN, 0);
     }
-    digitalWrite(STATUS_LED_1, HIGH);
+    digitalWrite(CO_STATUS_LED, HIGH);
 
   } else {
     analogWrite(ALARM_PIN, 0);
-    digitalWrite(STATUS_LED_1, LOW);
+    digitalWrite(CO_STATUS_LED, LOW);
   }
 
   // LEDController.UpdateLEDs();
