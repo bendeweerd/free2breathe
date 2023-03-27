@@ -153,6 +153,7 @@ void setup() {
   //     delay(1000);
   //   }
   // }
+  // Serial.println("Finished Setting Up, Replace Sensor Now.\n");2
 
   //...with this code and your measured value of new Vref
   sensor1.pVref_set = 1638.31;
@@ -160,8 +161,7 @@ void setup() {
   // sensor3.pVref_set = ;
   // sensor4.pVref_set = ;
 
-  Serial.println();
-  Serial.println("Setting Up.");
+  Serial.println("\nSetting Up.");
 
   Serial.print("  Vsup for all sensors = ");
   Serial.println(sensor1.pVsup);
@@ -170,22 +170,20 @@ void setup() {
   Serial.print("  Vref for sensor 1 = ");
   Serial.println(sensor1.pVref);
 
-  // Serial.println("Finished Setting Up, Replace Sensor Now.\n");2
-  // Serial.println("\n\ns, analogRead(), temp, mV, nA, PPB, PPM");
-  Serial.println("\n\ns, temp, PPM");
-  // etime = millis();
+  Serial.println("\nSystem starting up, please wait for stabilization.");
+  Serial.println("\n\nData Log:");
+  Serial.println("s, temp, PPM");
 
+  sensorPreviousMillis = millis();
+  tempPreviousMillis = millis();
+
+  // system startup delay
   for (unsigned i = 0; i <= 25; i++) {
     LEDController.currentLEDState = f2b::LEDState::SOLID_BLUE;
     LEDController.SetNumLEDs(i);
     LEDController.UpdateLEDs();
     delay(1000);
   }
-  LEDController.currentLEDState = f2b::LEDState::OFF;
-  LEDController.UpdateLEDs();
-
-  sensorPreviousMillis = millis();
-  tempPreviousMillis = millis();
 }
 
 void loop() {
