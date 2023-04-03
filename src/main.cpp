@@ -42,14 +42,14 @@ const float Sf3 = -60;
 const float Sf4 = -30;
 
 // TODO: update from specs
-const unsigned coWorryConcentration = 9;
-const unsigned coDangerConcentration = 200;
-const unsigned so2WorryConcentration = 10000;
-const unsigned so2DangerConcentration = 10000;
-const unsigned o3WorryConcentration = 10000;
-const unsigned o3DangerConcentration = 10000;
-const unsigned no2WorryConcentration = 10000;
-const unsigned no2DangerConcentration = 10000;
+const unsigned coWorryConcentration = 9;        // ppm
+const unsigned coDangerConcentration = 200;     // ppm
+const unsigned so2WorryConcentration = 100;     // ppb
+const unsigned so2DangerConcentration = 10000;  // ppb
+const unsigned o3WorryConcentration = 400;      // ppm
+const unsigned o3DangerConcentration = 10000;   // ppm
+const unsigned no2WorryConcentration = 3;       // ppm
+const unsigned no2DangerConcentration = 10000;  // ppm
 
 bool coPresent = false;
 bool so2Present = false;
@@ -120,7 +120,7 @@ void setup() {
 
   FastLED.addLeds<WS2812B, LED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
       .setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(20);
+  FastLED.setBrightness(50);
   LEDController.currentLEDState = f2b::LEDState::OFF;
   LEDController.UpdateLEDs();
 
@@ -174,7 +174,7 @@ void setup() {
   //     delay(1000);
   //   }
   // }
-  // Serial.println("Finished Setting Up, Replace Sensor Now.\n");2
+  // Serial.println("Finished Setting Up, Replace Sensor Now.\n");
 
   //...with this code and your measured value of new Vref
   COsensor.pVref_set = 1638.31;
@@ -200,11 +200,11 @@ void setup() {
 
   // system startup delay
   for (unsigned i = 0; i <= 25; i++) {
-    LEDController.currentLEDState = f2b::LEDState::SOLID_BLUE;
+    LEDController.currentLEDState = f2b::LEDState::BLUE;
     LEDController.SetNumLEDs(i);
     LEDController.UpdateLEDs();
     // TODO: update for desired startup time
-    delay(100);
+    delay(1000);
   }
 }
 
@@ -306,11 +306,11 @@ void loop() {
     // }
 
     if (alarm) {
-      LEDController.currentLEDState = f2b::LEDState::SOLID_RED;
+      LEDController.currentLEDState = f2b::LEDState::RED;
     } else if (coPresent || so2Present || o3Present || no2Present) {
-      LEDController.currentLEDState = f2b::LEDState::SOLID_YELLOW;
+      LEDController.currentLEDState = f2b::LEDState::YELLOW;
     } else {
-      LEDController.currentLEDState = f2b::LEDState::SOLID_GREEN;
+      LEDController.currentLEDState = f2b::LEDState::GREEN;
     }
 
     digitalWrite(CO_STATUS_LED, coPresent);
