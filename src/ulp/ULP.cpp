@@ -78,15 +78,12 @@ void ULP::setTSpan(float t, String R) {
 }
 
 void ULP::setVref(int b, long R2) {
-  // Caluclate Expected Vref
-  // Serial.println("setVref()");
+  // Calculate Expected Vref
   if (b >= 0)
     pVref = pVsup * float(R2 + 1000000) / float(R2 + 2000000) * 1000.0;
   else
     pVref = pVsup * float(1000000) / float(R2 + 2000000) * 1000.0;
   pVref_set = pVref;
-  // Serial.print("  pVRef = pVref_set: ");
-  // Serial.println(pVref);
 }
 
 bool ULP::OCzero(int n) {

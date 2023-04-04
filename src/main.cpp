@@ -27,39 +27,36 @@
  * Sensors
  ***************************************/
 
-// sensor averaging times
-const int n = 2;  // seconds to read gas sensor
-const int s = 3;  // seconds to read all sensors, should be greater than n+m+1
+const int sensorReadTime = 2;  // seconds to read gas sensor
 
 // Sensitivities (as shown on sensor barcodes)
 // CO: 4.47 nA / ppm
 // SO2: 39.23 nA / ppm
 // O3: -60 nA +- 10 / ppm
 // NO2: -30 nA +- 10 / ppm
-const float Sf1 = 4.47;
-const float Sf2 = 39.23;
-const float Sf3 = -60;
-const float Sf4 = -30;
+const float coSensitivityFactor = 4.47;
+const float so2SensitivityFactor = 39.23;
+const float o3SensitivityFactor = -60;
+const float no2SensitivityFactor = -30;
 
-// TODO: update from specs
-const unsigned coWorryConcentration = 9;        // ppm
-const unsigned coDangerConcentration = 200;     // ppm
-const unsigned so2WorryConcentration = 100;     // ppb
-const unsigned so2DangerConcentration = 10000;  // ppb
-const unsigned o3WorryConcentration = 400;      // ppm
-const unsigned o3DangerConcentration = 10000;   // ppm
-const unsigned no2WorryConcentration = 3;       // ppm
-const unsigned no2DangerConcentration = 10000;  // ppm
+const float coWorryConcentration = 9;     // ppm
+const float coDangerConcentration = 200;  // ppm
+const float so2WorryConcentration = 2;    // ppm
+const float so2DangerConcentration = 5;   // ppm
+const float o3WorryConcentration = 0.1;   // ppm
+const float o3DangerConcentration = 0.3;  // ppm
+const float no2WorryConcentration = 0.2;  // ppm
+const float no2DangerConcentration = 1;   // ppm
 
 bool coPresent = false;
 bool so2Present = false;
 bool o3Present = false;
 bool no2Present = false;
 
-CO COsensor(CO_READ_PIN, THERMISTOR_READ_PIN, Sf1);
-SO2 SO2sensor(SO2_READ_PIN, THERMISTOR_READ_PIN, Sf2);
-O3 O3sensor(O3_READ_PIN, THERMISTOR_READ_PIN, Sf3);
-NO2 NO2sensor(NO2_READ_PIN, THERMISTOR_READ_PIN, Sf4);
+CO COsensor(CO_READ_PIN, THERMISTOR_READ_PIN, coSensitivityFactor);
+SO2 SO2sensor(SO2_READ_PIN, THERMISTOR_READ_PIN, so2SensitivityFactor);
+O3 O3sensor(O3_READ_PIN, THERMISTOR_READ_PIN, o3SensitivityFactor);
+NO2 NO2sensor(NO2_READ_PIN, THERMISTOR_READ_PIN, no2SensitivityFactor);
 
 /***************************************
  * LEDs
@@ -90,7 +87,7 @@ float temp = 20.0;
  ***************************************/
 double runTime = 0.0;
 unsigned long sensorPreviousMillis = 0;
-unsigned sensorPollPeriod = 10000;
+unsigned sensorPollPeriod = 20000;
 unsigned long tempPreviousMillis = 0;
 unsigned tempPeriod = 50;
 unsigned long buzzerPreviousMillis = 0;
@@ -127,14 +124,9 @@ void setup() {
   // bitmasking to set buzzer PWM frequency
   TCCR2B = ((TCCR2B & B11111000) | B00000011);
 
-  COsensor.pVcc = 4.993;  // TODO: update if micro or power supply changes
-  COsensor.pVsup = 3.293;
-  SO2sensor.pVcc = COsensor.pVcc;
-  SO2sensor.pVsup = COsensor.pVsup;
-  O3sensor.pVcc = COsensor.pVcc;
-  O3sensor.pVsup = COsensor.pVsup;
-  NO2sensor.pVcc = COsensor.pVcc;
-  NO2sensor.pVsup = COsensor.pVsup;
+  // update if micro or power supply changes
+  COsensor.pVcc = SO2sensor.pVcc = O3sensor.pVcc = NO2sensor.pVcc = 4.993;
+  COsensor.pVsup = SO2sensor.pVsup = O3sensor.pVsup = NO2sensor.pVsup = 3.293;
 
   // CO
   long int CO_R2 = 1999;  // spec 2k
@@ -162,7 +154,8 @@ void setup() {
 
   Serial.begin(9600);
 
-  // if you know the V_ref replace the following code...
+  // if V_ref is known replace the following code...
+
   // Serial.println("Remove Sensor.");
   // if (SO2sensor.OCzero(n)) {
   //   Serial.print("Vref new = ");
@@ -170,17 +163,17 @@ void setup() {
   // } else {
   //   Serial.println("Recheck Settings, Zero out of range");
   //   while (1) {
-  //     Serial.println(analogRead(A0));
+  //     Serial.println(analogRead(SO2_READ_PIN));
   //     delay(1000);
   //   }
   // }
   // Serial.println("Finished Setting Up, Replace Sensor Now.\n");
 
-  //...with this code and your measured value of new Vref
+  //...with the measured value of new Vref
   COsensor.pVref_set = 1638.31;
-  // SO2sensor.pVref_set = ;
-  // O3sensor.pVref_set = ;
-  // NO2sensor.pVref_set = ;
+  SO2sensor.pVref_set = 1525.92;
+  O3sensor.pVref_set = 1657.67;
+  NO2sensor.pVref_set = 1657.12;
 
   Serial.println("\nSetting Up.");
 
@@ -188,12 +181,10 @@ void setup() {
   Serial.println(COsensor.pVsup);
   Serial.print("  Vcc for all sensors = ");
   Serial.println(COsensor.pVcc);
-  Serial.print("  Vref for sensor 1 = ");
-  Serial.println(COsensor.pVref);
 
   Serial.println("\nSystem starting up, please wait for stabilization.");
-  Serial.println("\n\nData Log:");
-  Serial.println("s, temp, PPM");
+  Serial.println("\nData Log:");
+  Serial.println("s, temp, CO PPM, SO2 PPM, O3 PPM, NO2 PPM");
 
   sensorPreviousMillis = millis();
   tempPreviousMillis = millis();
@@ -204,7 +195,7 @@ void setup() {
     LEDController.SetNumLEDs(i);
     LEDController.UpdateLEDs();
     // TODO: update for desired startup time
-    delay(1000);
+    delay(50);
   }
 }
 
@@ -254,32 +245,29 @@ void loop() {
     digitalWrite(O3_STATUS_LED, LOW);
     digitalWrite(NO2_STATUS_LED, LOW);
     analogWrite(ALARM_PIN, 0);
-
-    // delay to prevent effect of current draw
     delay(1000);
 
-    COsensor.getIgas(n);
+    COsensor.getIgas(sensorReadTime);
     COsensor.setTemp(temp);
     COsensor.getConc(temp);
 
-    // SO2sensor.getIgas(n);
-    // SO2sensor.getTemp(m);
-    // SO2sensor.getConc(20);
+    SO2sensor.getIgas(sensorReadTime);
+    SO2sensor.setTemp(temp);
+    SO2sensor.getConc(temp);
 
-    // O3sensor.getIgas(n);
-    // O3sensor.getTemp(m);
-    // O3sensor.getConc(20);
+    O3sensor.getIgas(sensorReadTime);
+    O3sensor.setTemp(temp);
+    O3sensor.getConc(temp);
 
-    // NO2sensor.getIgas(n);
-    // NO2sensor.getTemp(m);
-    // NO2sensor.getConc(20);
+    NO2sensor.getIgas(sensorReadTime);
+    NO2sensor.setTemp(temp);
+    NO2sensor.getConc(temp);
 
     // scale reading based on test data
-    // TODO: determine scale for each gas
     float COppm = COsensor.convertX('B') / 1.5;
-    float SO2ppm = 0;
-    float O3ppm = 0;
-    float NO2ppm = 0;
+    float SO2ppm = SO2sensor.convertX('B') / 1.5;
+    float O3ppm = O3sensor.convertX('B') / 1.5;
+    float NO2ppm = NO2sensor.convertX('B') / 1.5;
 
     alarm = false;
     if (COppm >= coDangerConcentration || SO2ppm >= so2DangerConcentration ||
@@ -295,15 +283,15 @@ void loop() {
     if (COppm > coWorryConcentration) {
       coPresent = true;
     }
-    // if (SO2ppm > so2WorryConcentration) {
-    //   so2Present = true;
-    // }
-    // if (O3ppm > o3WorryConcentration) {
-    //   o3Present = true;
-    // }
-    // if (no2Present > no2WorryConcentration) {
-    //   no2Present = true;
-    // }
+    if (SO2ppm > so2WorryConcentration) {
+      so2Present = true;
+    }
+    if (O3ppm > o3WorryConcentration) {
+      o3Present = true;
+    }
+    if (NO2ppm > no2WorryConcentration) {
+      no2Present = true;
+    }
 
     if (alarm) {
       LEDController.currentLEDState = f2b::LEDState::RED;
@@ -324,9 +312,16 @@ void loop() {
     Serial.print(", ");
     Serial.print(temp);
     Serial.print(", ");
-    Serial.println(COppm);
+    Serial.print(COppm);
+    Serial.print(", ");
+    Serial.print(SO2ppm);
+    Serial.print(", ");
+    Serial.print(O3ppm);
+    Serial.print(", ");
+    Serial.println(NO2ppm);
   }
 
+  // sound alarm if appropriate
   if (alarm) {
     if (millis() - buzzerPreviousMillis >= buzzerPeriod) {
       buzzerOn = !buzzerOn;
@@ -337,12 +332,7 @@ void loop() {
     } else {
       analogWrite(ALARM_PIN, 0);
     }
-    digitalWrite(CO_STATUS_LED, HIGH);
-
   } else {
     analogWrite(ALARM_PIN, 0);
-    digitalWrite(CO_STATUS_LED, LOW);
   }
-
-  // LEDController.UpdateLEDs();
 }
